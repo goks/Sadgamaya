@@ -1,6 +1,5 @@
- $("#login-button").click(function(event){
-		 event.preventDefault();
-	 
+ var successanimation = function(){
+	
 	 $('form').fadeOut(500);
 	 $('.wrapper').addClass('form-success');
-});
+};

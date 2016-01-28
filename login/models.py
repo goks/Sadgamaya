@@ -3,7 +3,7 @@ from django.utils import timezone
 
 class User(models.Model):
 	"""docstring for User"""
-	firstName = models.CharField(max_length=200)
+	firstName = models.CharField(max_length=200, unique=False)
 	lastName = models.CharField(max_length=200)
 	#user_id = models.CharField(max_length=200,primary_key=True)
 	email = models.EmailField(max_length=254,primary_key=True)
