@@ -164,13 +164,13 @@ def tokenpass(request):
 		return HttpResponse('3')
 	u.chatactive = True
 	f.chatactive = True
-	print u.token
 	f.tempfriendtoken = u.token
+	u.tempfriendtoken = f.token
+	print f.tempfriendtoken + "  " + f.firstName
 	u.save()
 	f.save()
 	print ">>Invoked Client's Chat Initialized"
-	receiver = request.session['receiver'] 
-	receiver = 0
+	request.session['receiver']=0 
 	return HttpResponse('1')
 
 @csrf_exempt
@@ -194,11 +194,11 @@ def chatcheck(request):
    	#	while True :
    	receiver = request.session['receiver'] 
    	if (u.chatactive):
-   			print ">>RECEIVER CHAT ACTIVE"
-   			receiver = 1
+   			print ">>"+u.firstName+" CHAT ACTIVE"
+   			request.session['receiver'] = 1
    			return HttpResponse('1')
    	else :
-   			print ">>RECEIVER WAITING FOR CHAT"
+   			print ">>"+u.firstName+"RECEIVER WAITING FOR CHAT"
    			return HttpResponse('0')
    	return HttpResponse("Error")
 
@@ -208,12 +208,12 @@ def chatbox(request):
 	#if (request.session.test_cookie_worked()):
 	#	print ">>>> TEST COOKIE WORKED!"
     #	request.session.delete_test_cookie()
-    global email
+    email = request.session['email']
     if ('chatbox' in request.session and request.session['chatbox']==1):
     	request.session['dashboard'] = 0
     	template=loader.get_template('chat.html')
     	context=RequestContext(request)
-    	u = User.objects.get(email = request.session['email'])
+    	u = User.objects.get(email = email)
     	temp = u.friendslist
     	receiver = request.session['receiver'] 
     	print "receiver is" + str(receiver)
@@ -221,13 +221,14 @@ def chatbox(request):
     		try:
     			f = User.objects.get(token = u.tempfriendtoken)
     			friendsemail = f.email
+    			print ">>>Receivers friend is " + f.firstName + "s"
     		except:
     			print ">>> Friend Not FOUND"
     		if temp:
-    			print ">>>>>"+temp
+    			# print ">>>>>"+temp
     			tempstring = temp.split()
     			for word in tempstring:
-    				print ">>>>>>" + word
+    				# print ">>>>>>" + word
     				if(word==friendsemail):
     					print ">>>>>>>Friend already in Database"
     					break
@@ -239,8 +240,8 @@ def chatbox(request):
     			print ">>>Friend added to db"
     		u.save()	
     	else:		
-    		temp = temp.split()
-    		f = User.objects.get(email = temp[-1])
+    		f = User.objects.get(token = u.tempfriendtoken)
+    		print ">>>Caller: " + u.firstName + "receiver is: " + f.firstName
     		# userid = u.firstName+" "+u.lastName
     	return render_to_response('chat.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
     	# else:
