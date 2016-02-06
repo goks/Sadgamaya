@@ -13,8 +13,7 @@ import json
 import datetime
 import time
 # Create your views here.
-email = 'temp@123'
-receiver = False
+
 #======Index Page======#
 @ensure_csrf_cookie #cross reference 
 def index(request):
@@ -22,6 +21,7 @@ def index(request):
 	context=RequestContext(request)
 	request.session['dashboard'] =	0
 	request.session['chatbox'] = 0
+	request.session['receiver'] = 0
 	#request.session.set_test_cookie()
 	#request.session['login'] = 0
 	return HttpResponse(template.render(context))
@@ -44,12 +44,15 @@ def auth(request):
  	req = urllib2.Request(url)
  	response = urllib2.urlopen(req)
  	response = json.load(response)
- 	global email
+ 	# print response
  	if response['aud']=='841750429424-1hba7bekjmrm1ngbn3m2hrlfb44fodgu.apps.googleusercontent.com':
  		firstname = response['given_name']
  		lastname = response['family_name']
  		email = response['email']
- 	 	imageurl = response['picture']
+ 		try:
+ 	 		imageurl = response['picture']
+ 	 	except:
+ 	 		imageurl = 'https://cdn4.iconfinder.com/data/icons/small-n-flat/24/user-alt-128.png'
  	 	userid = response['sub']
  	 	print ">>>>JSON PARSE COMPLETE"
  	else:
@@ -84,6 +87,7 @@ def auth(request):
 		print ">>>Existing user"
 	except:
 		print ">>>Firstuser"	
+		#print "image >>>"+imageurl
 		now = datetime.datetime.now()
 		u = User(firstname, lastname, now, email, imageurl)
 	u.save()
@@ -118,6 +122,7 @@ def dash(request):
 def tokenpass(request):
 	#userid = request.POST.get('iduser=', 'NULL')
  	# token = request.POST.get('token=', 'NULL')
+ 	email = request.session['email']
  	friendsEmail = request.POST.get('friendsEmail=', 'NULL')
 	print ">>>friendsEmail: " + friendsEmail
  	# print ">>>Token: " + token
@@ -128,6 +133,7 @@ def tokenpass(request):
 		u.beacon = datetime.datetime.now()
 		# u.save()
 		print ">>Token of Caller: " + u.token
+		print ">>Caller is: " + u.firstName
 	except:
 		print ">>fail"
 		return HttpResponse('0')
@@ -163,8 +169,8 @@ def tokenpass(request):
 	u.save()
 	f.save()
 	print ">>Invoked Client's Chat Initialized"
-	global receiver
-	receiver = False
+	receiver = request.session['receiver'] 
+	receiver = 0
 	return HttpResponse('1')
 
 @csrf_exempt
@@ -174,20 +180,22 @@ def chatcheck(request):
 	#	print ">>>> TEST COOKIE WORKED!"
     #	request.session.delete_test_cookie()
    	# token = request.POST.get('token=', 'NULL')
+   	email = request.session['email']
    	try:
    		u = User.objects.get(email=email)
    		# u.token = token;
    		u.beacon = datetime.datetime.now()
    		u.save()
+ 		print ">>>receiver is: "+ u.firstName
    		print ">>Token in Database"
    	except:
    		print ">>Error adding token to db"
-   		return HttpResponse("0")
+   		return HttpResponse("3")
    	#	while True :
-   	global receiver
+   	receiver = request.session['receiver'] 
    	if (u.chatactive):
    			print ">>RECEIVER CHAT ACTIVE"
-   			receiver = True
+   			receiver = 1
    			return HttpResponse('1')
    	else :
    			print ">>RECEIVER WAITING FOR CHAT"
@@ -200,17 +208,19 @@ def chatbox(request):
 	#if (request.session.test_cookie_worked()):
 	#	print ">>>> TEST COOKIE WORKED!"
     #	request.session.delete_test_cookie()
+    global email
     if ('chatbox' in request.session and request.session['chatbox']==1):
     	request.session['dashboard'] = 0
     	template=loader.get_template('chat.html')
     	context=RequestContext(request)
     	u = User.objects.get(email = request.session['email'])
     	temp = u.friendslist
-    	global receiver
+    	receiver = request.session['receiver'] 
     	print "receiver is" + str(receiver)
-    	if receiver==True:
+    	if receiver==1:
     		try:
     			f = User.objects.get(token = u.tempfriendtoken)
+    			friendsemail = f.email
     		except:
     			print ">>> Friend Not FOUND"
     		if temp:
@@ -218,14 +228,14 @@ def chatbox(request):
     			tempstring = temp.split()
     			for word in tempstring:
     				print ">>>>>>" + word
-    				if(word==f.email):
+    				if(word==friendsemail):
     					print ">>>>>>>Friend already in Database"
     					break
     			else:
     				print ">>>>>>>>Friendslist not empty;Friend first time"
-    				u.friendslist = temp + ' ' + f.email
+    				u.friendslist = temp + ' ' + friendsemail
     		else:
-    			u.friendslist = f.email
+    			u.friendslist = friendsemail
     			print ">>>Friend added to db"
     		u.save()	
     	else:		

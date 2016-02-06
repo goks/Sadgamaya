@@ -94,7 +94,6 @@
 
 <div class="toolbar">Winky</div>
 <p class="myIdtxt">Peer id : <span class="myId">{{friendtoken}}</span></p>
-<input class="connect" placeholder="connect to">
 <p class="connectionStatus">Connecting ...</p>
 
 <div class="chatBox">
@@ -174,7 +173,7 @@ function connect (argument) {
 	}	
 	connectedPeer.on('open', function(){
 	  connectionStatus.textContent = "connected";
-	  alert("Connected");
+	  //alert("Connected");
 	});
 	console.log(friendID);
 	console.log(myId);
