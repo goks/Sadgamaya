@@ -10,13 +10,18 @@ from django.shortcuts import redirect
 from django.views.decorators.cache import never_cache
 import urllib2 
 import json
+import datetime
+import time
 # Create your views here.
+email = 'temp@123'
+receiver = False
 #======Index Page======#
 @ensure_csrf_cookie #cross reference 
 def index(request):
 	template=loader.get_template('login.html')
 	context=RequestContext(request)
-	request.session['dashboard']==0
+	request.session['dashboard'] =	0
+	request.session['chatbox'] = 0
 	#request.session.set_test_cookie()
 	#request.session['login'] = 0
 	return HttpResponse(template.render(context))
@@ -39,6 +44,7 @@ def auth(request):
  	req = urllib2.Request(url)
  	response = urllib2.urlopen(req)
  	response = json.load(response)
+ 	global email
  	if response['aud']=='841750429424-1hba7bekjmrm1ngbn3m2hrlfb44fodgu.apps.googleusercontent.com':
  		firstname = response['given_name']
  		lastname = response['family_name']
@@ -48,11 +54,11 @@ def auth(request):
  	 	print ">>>>JSON PARSE COMPLETE"
  	else:
  		return HttpResponse("fail")
- 	url= 'https://www.googleapis.com/plus/v1/people/'+userid+'/people/connected'	
- 	req = urllib2.Request(url)
- 	response = urllib2.urlopen(req)
- 	print response
-    # set the body
+ 	# url= 'https://www.googleapis.com/plus/v1/people/'+userid+'/people/connected'	
+ 	# req = urllib2.Request(url)
+ 	# response = urllib2.urlopen(req)
+ 	# print response
+  #   # set the body
     #r = HttpResponse(response.read())
 #
     # set the headers
@@ -74,14 +80,17 @@ def auth(request):
 		return HttpResponse('0')
 	try:
 		u = User.objects.get(email=email)
+		u.chatactive = False
 		print ">>>Existing user"
 	except:
 		print ">>>Firstuser"	
-		u = User(firstname, lastname, email, imageurl)
-		u.save()
+		now = datetime.datetime.now()
+		u = User(firstname, lastname, now, email, imageurl)
+	u.save()
 	request.session['email'] = email
 	request.session['dashboard']=1
 	print ">>>passed Oauth"
+	# print ">>>NOW IS: "+ datetime.datetime.now().strftime('%m/%d/%Y')
 	#request.session['login'] = 1
 	#return HttpResponse("firstname: " + firstname +"\nlastname: " + lastname + "\nemail: " + email +"\nimageurl: " + imageurl)
 	context=RequestContext(request)
@@ -95,11 +104,136 @@ def dash(request):
     #	request.session.delete_test_cookie()
     if ('dashboard' in request.session and request.session['dashboard']==1):
     	request.session['dashboard']=0
+    	request.session['chatbox']=1
     	template=loader.get_template('dash.html')
     	context=RequestContext(request)
     	u = User.objects.get(email=request.session['email'])
+    	u.chatactive = False
     	userid = u.firstName+" "+u.lastName
-    	return render_to_response('dash.html',{'userid':userid})
+    	print u.token
+    	return render_to_response('dash.html',{'userid':userid},context)
     return redirect('index')
-    		
+ 
+@csrf_exempt    		
+def tokenpass(request):
+	#userid = request.POST.get('iduser=', 'NULL')
+ 	# token = request.POST.get('token=', 'NULL')
+ 	friendsEmail = request.POST.get('friendsEmail=', 'NULL')
+	print ">>>friendsEmail: " + friendsEmail
+ 	# print ">>>Token: " + token
+ 	print ">>>clientemail: " + email
+	try:
+		u = User.objects.get(email=email)
+		# u.token = token;
+		u.beacon = datetime.datetime.now()
+		# u.save()
+		print ">>Token of Caller: " + u.token
+	except:
+		print ">>fail"
+		return HttpResponse('0')
+	temp = u.friendslist	
+	try:
+		f = User.objects.get(email = friendsEmail)
+	except:
+		print ">>> Friend Not FOUND"
+		return HttpResponse('2')
+	# temp = u.friendslist
+	# print ">>>>>"+temp
+	if temp:
+		print ">>>>>"+temp
+		tempstring = temp.split()
+		for word in tempstring:
+			print ">>>>>>" + word
+			if(word==friendsEmail):
+				print ">>>>>>>Friend already in Database"
+				break
+		else:		
+			print ">>>>>>>>Friend first time"		
+			u.friendslist = temp + ' ' + friendsEmail	
+	else:
+		u.friendslist = friendsEmail
+		print ">>>Friend added to db"
+	if(f.chatactive):
+		print ">>>Friend already in another chat"
+		return HttpResponse('3')
+	u.chatactive = True
+	f.chatactive = True
+	print u.token
+	f.tempfriendtoken = u.token
+	u.save()
+	f.save()
+	print ">>Invoked Client's Chat Initialized"
+	global receiver
+	receiver = False
+	return HttpResponse('1')
+
+@csrf_exempt
+@never_cache
+def chatcheck(request):
+	#if (request.session.test_cookie_worked()):
+	#	print ">>>> TEST COOKIE WORKED!"
+    #	request.session.delete_test_cookie()
+   	# token = request.POST.get('token=', 'NULL')
+   	try:
+   		u = User.objects.get(email=email)
+   		# u.token = token;
+   		u.beacon = datetime.datetime.now()
+   		u.save()
+   		print ">>Token in Database"
+   	except:
+   		print ">>Error adding token to db"
+   		return HttpResponse("0")
+   	#	while True :
+   	global receiver
+   	if (u.chatactive):
+   			print ">>RECEIVER CHAT ACTIVE"
+   			receiver = True
+   			return HttpResponse('1')
+   	else :
+   			print ">>RECEIVER WAITING FOR CHAT"
+   			return HttpResponse('0')
+   	return HttpResponse("Error")
+
+@csrf_exempt
+@never_cache
+def chatbox(request):
+	#if (request.session.test_cookie_worked()):
+	#	print ">>>> TEST COOKIE WORKED!"
+    #	request.session.delete_test_cookie()
+    if ('chatbox' in request.session and request.session['chatbox']==1):
+    	request.session['dashboard'] = 0
+    	template=loader.get_template('chat.html')
+    	context=RequestContext(request)
+    	u = User.objects.get(email = request.session['email'])
+    	temp = u.friendslist
+    	global receiver
+    	print "receiver is" + str(receiver)
+    	if receiver==True:
+    		try:
+    			f = User.objects.get(token = u.tempfriendtoken)
+    		except:
+    			print ">>> Friend Not FOUND"
+    		if temp:
+    			print ">>>>>"+temp
+    			tempstring = temp.split()
+    			for word in tempstring:
+    				print ">>>>>>" + word
+    				if(word==f.email):
+    					print ">>>>>>>Friend already in Database"
+    					break
+    			else:
+    				print ">>>>>>>>Friendslist not empty;Friend first time"
+    				u.friendslist = temp + ' ' + f.email
+    		else:
+    			u.friendslist = f.email
+    			print ">>>Friend added to db"
+    		u.save()	
+    	else:		
+    		temp = temp.split()
+    		f = User.objects.get(email = temp[-1])
+    		# userid = u.firstName+" "+u.lastName
+    	return render_to_response('chat.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
+    	# else:
+    	# 	return render_to_response('chat.html',{'receiver':receiver,'friendtoken':'none', 'mytoken':u.token}) 		
+    return redirect('index')
 	

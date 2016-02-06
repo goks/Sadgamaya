@@ -25,7 +25,10 @@ SECRET_KEY = '^m-&dy$&g2k5wudghhzm$q$&a!*b0r*uy2hp10i-_s=%4#0##='
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://127.0.0.1:8000/']
+
+# SwampDragon settings
+#SWAMP_DRAGON_CONNECTION = ('swampdragon.connections.sockjs_connection.DjangoSubscriberConnection', '/data')
 
 
 # Application definition
@@ -38,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'login', #model
+    #'socket_server',
+    #'south',
 ]
 
 MIDDLEWARE_CLASSES = [
@@ -80,7 +85,7 @@ DATABASES = {
         'NAME': 'sadgulogindb',
         'USER': 'sadguuser',
         'PASSWORD': '123',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'PORT': '',
     }
 }

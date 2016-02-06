@@ -1,0 +1,292 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"re",
+				"response"
+			],
+			[
+				"url",
+				"urllib2"
+			],
+			[
+				"H",
+				"HttpResponse"
+			],
+			[
+				"user",
+				"userid"
+			],
+			[
+				"da",
+				"dashboard"
+			],
+			[
+				"redirec",
+				"redirect_kuttan"
+			],
+			[
+				"red",
+				"redirect"
+			],
+			[
+				"d",
+				"def	Function"
+			],
+			[
+				"lo",
+				"login"
+			],
+			[
+				"das",
+				"dashboard"
+			],
+			[
+				"cs",
+				"csrf_exempt"
+			],
+			[
+				"pr",
+				"profile"
+			],
+			[
+				"n",
+				"NULL"
+			],
+			[
+				"id",
+				"id_imageurl"
+			],
+			[
+				"csr",
+				"csrf_exempt"
+			],
+			[
+				"ur",
+				"url"
+			],
+			[
+				"f",
+				"from"
+			],
+			[
+				"inc",
+				"include"
+			],
+			[
+				"coun",
+				"county"
+			],
+			[
+				"cou",
+				"count"
+			],
+			[
+				"in",
+				"int"
+			],
+			[
+				"car",
+				"carhump"
+			],
+			[
+				"c",
+				"count"
+			],
+			[
+				"u",
+				"url"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 0.0,
+		"history":
+		[
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/etc/profile",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/templates/dashboard/index.html",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/views.py",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/templates/dashboard/history.html",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/templates/login/index.html",
+		"/home/goks/bin/virtualEnv/sadgu/sadgamaya/settings.py",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/urls.py",
+		"/media/goks/Data/Dalalbull/kishen_hari-dalal-bull-2k15-d549930d5b28/Dalal-Bull-2k15-django/dalalbull/login/models.py",
+		"/home/goks/bin/virtualEnv/sadgu/login/static/js/login.js",
+		"/home/goks/bin/virtualEnv/sadgu/sadgamaya/urls.py",
+		"/home/goks/Desktop/webservice/login]/js/index.js",
+		"/home/goks/Desktop/webservice/login]/index.html",
+		"/home/goks/Desktop/webservice/login]/css/style.css",
+		"/home/goks/bin/virtualEnv/venv/blog/templates/blog/base.html",
+		"/usr/share/nemo/actions/vlc.nemo_action",
+		"/home/goks/bin/ball_projection.c",
+		"/home/goks/bin/rainman.c",
+		"/home/goks/bin/car_through_hump.c",
+		"/home/goks/bin/injection.c",
+		"/home/goks/bin/heart.c",
+		"/home/goks/bin/virtualEnv/venv/blog/static/css/blog.css",
+		"/home/goks/bin/virtualEnv/venv/blog/templates/blog/post_list.html",
+		"/home/goks/bin/virtualEnv/venv/blog/urls.py",
+		"/home/goks/bin/virtualEnv/venv/blog/views.py",
+		"/home/goks/bin/virtualEnv/venv/blog/static/blog.css",
+		"/home/goks/bin/virtualEnv/venv/mysite/urls.py"
+	],
+	"find":
+	{
+		"height": 25.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"url",
+			"user_id",
+			"redire",
+			"islogg",
+			"45",
+			"13"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 25.0
+	},
+	"input":
+	{
+		"height": 0.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "dash.sublime-project",
+	"replace":
+	{
+		"height": 46.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 150.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
