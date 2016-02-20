@@ -6,7 +6,7 @@ from string import ascii_uppercase
 
 
 def generatetoken():
-		return (''.join(choice(ascii_uppercase) for i in range(12)))
+			return (''.join(choice(ascii_uppercase) for i in range(12)))
 	
 class User(models.Model):
 	"""docstring for User"""
@@ -21,6 +21,7 @@ class User(models.Model):
 	chatactive = models.BooleanField(default=False)
 	friendslist = models.CharField(max_length=1000, null=True)
 	tempfriendtoken = models.CharField(max_length=254,null=True,default='0')
+	chattype = models.CharField(max_length=10, null=True);
 
 	def __str__(self, arg):
 		return self.email

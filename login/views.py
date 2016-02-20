@@ -90,7 +90,10 @@ def auth(request):
 		#print "image >>>"+imageurl
 		now = datetime.datetime.now()
 		u = User(firstname, lastname, now, email, imageurl)
-	u.save()
+	try:
+		u.save()
+	except:
+		return HttpResponse("0")
 	request.session['email'] = email
 	request.session['dashboard']=1
 	print ">>>passed Oauth"
@@ -108,7 +111,7 @@ def dash(request):
     #	request.session.delete_test_cookie()
     if ('dashboard' in request.session and request.session['dashboard']==1):
     	request.session['dashboard']=0
-    	request.session['chatbox']=1
+    	request.session['chatbox']=0
     	template=loader.get_template('dash.html')
     	context=RequestContext(request)
     	u = User.objects.get(email=request.session['email'])
@@ -124,6 +127,7 @@ def tokenpass(request):
  	# token = request.POST.get('token=', 'NULL')
  	email = request.session['email']
  	friendsEmail = request.POST.get('friendsEmail=', 'NULL')
+ 	chatType = request.POST.get('type=', 'NULL')
 	print ">>>friendsEmail: " + friendsEmail
  	# print ">>>Token: " + token
  	print ">>>clientemail: " + email
@@ -166,9 +170,13 @@ def tokenpass(request):
 	f.chatactive = True
 	f.tempfriendtoken = u.token
 	u.tempfriendtoken = f.token
+	u.chattype = chatType;
+	f.chattype = chatType;
 	print f.tempfriendtoken + "  " + f.firstName
+	print "Chattype is " + chatType
 	u.save()
 	f.save()
+	request.session['chatbox']=1
 	print ">>Invoked Client's Chat Initialized"
 	request.session['receiver']=0 
 	return HttpResponse('1')
@@ -196,7 +204,11 @@ def chatcheck(request):
    	if (u.chatactive):
    			print ">>"+u.firstName+" CHAT ACTIVE"
    			request.session['receiver'] = 1
-   			return HttpResponse('1')
+   			request.session['chatbox']=1
+   			if(u.chattype == "chat"):
+   					return HttpResponse('1')
+   			elif(u.chattype == "video"):
+   					return HttpResponse('2')
    	else :
    			print ">>"+u.firstName+"RECEIVER WAITING FOR CHAT"
    			return HttpResponse('0')
@@ -210,18 +222,20 @@ def chatbox(request):
     #	request.session.delete_test_cookie()
     email = request.session['email']
     if ('chatbox' in request.session and request.session['chatbox']==1):
+    	request.session['chatbox']=0
     	request.session['dashboard'] = 0
     	template=loader.get_template('chat.html')
     	context=RequestContext(request)
     	u = User.objects.get(email = email)
     	temp = u.friendslist
-    	receiver = request.session['receiver'] 
+    	receiver = request.session['receiver']
     	print "receiver is" + str(receiver)
     	if receiver==1:
+    		request.session['receiver'] = 3
     		try:
     			f = User.objects.get(token = u.tempfriendtoken)
     			friendsemail = f.email
-    			print ">>>Receivers friend is " + f.firstName + "s"
+    			print ">>>Receivers friend is " + f.firstName
     		except:
     			print ">>> Friend Not FOUND"
     		if temp:
@@ -239,12 +253,68 @@ def chatbox(request):
     			u.friendslist = friendsemail
     			print ">>>Friend added to db"
     		u.save()	
-    	else:		
-    		f = User.objects.get(token = u.tempfriendtoken)
+    	elif receiver==0:
+    		request.session['receiver'] = 3
+    		try:	
+    			f = User.objects.get(token = u.tempfriendtoken)
+    		except:
+    			print ">>>Failed obtaining activators friend's token"	
     		print ">>>Caller: " + u.firstName + "receiver is: " + f.firstName
     		# userid = u.firstName+" "+u.lastName
+    	else:
+    		print ">>>RECEIVER session variable 3 error"	
+    	print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token	
     	return render_to_response('chat.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
     	# else:
     	# 	return render_to_response('chat.html',{'receiver':receiver,'friendtoken':'none', 'mytoken':u.token}) 		
     return redirect('index')
-	
+
+@csrf_exempt
+@never_cache
+def vidbox(request):
+	email = request.session['email']
+	if ('chatbox' in request.session and request.session['chatbox']==1):
+		request.session['chatbox']=0
+		request.session['dashboard'] = 0
+		template=loader.get_template('vid.html')
+		context=RequestContext(request)
+		u = User.objects.get(email = email)
+		temp = u.friendslist
+		receiver = request.session['receiver']
+		print "receiver is" + str(receiver)
+		if receiver==1:
+			request.session['receiver'] = 3
+			try:
+				f = User.objects.get(token = u.tempfriendtoken)
+				friendsemail = f.email
+				print ">>>Receivers friend is " + f.firstName
+			except:
+				print ">>> Friend Not FOUND"
+			if temp:
+				# print ">>>>>"+temp
+				tempstring = temp.split()
+				for word in tempstring:
+					# print ">>>>>>" + word
+					if(word==friendsemail):
+						print ">>>>>>>Friend already in Database"
+						break
+				else:
+					print ">>>>>>>>Friendslist not empty;Friend first time"
+					u.friendslist = temp + ' ' + friendsemail
+			else:
+				u.friendslist = friendsemail
+				print ">>>Friend added to db"
+			u.save()
+		elif receiver==0:
+			request.session['receiver'] = 3
+			try:
+				f = User.objects.get(token = u.tempfriendtoken)
+			except:
+				print ">>>Failed obtaining activators friend's token"
+			print ">>>Caller: " + u.firstName + "receiver is: " + f.firstName
+			# userid = u.firstName+" "+u.lastName
+		else:
+			print ">>>RECEIVER session variable 3 error"
+		print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token
+		return render_to_response('vid.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
+	return redirect('index')

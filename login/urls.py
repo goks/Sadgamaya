@@ -9,4 +9,5 @@ urlpatterns = [
     url(r'^tokenpass/',views.tokenpass, name='pass'),
     url(r'^chatbox/',views.chatbox, name='chatbox'),
     url(r'^chatcheck/',views.chatcheck, name='chatcheck'),
-]
+    url(r'^vidbox/',views.vidbox, name='vidbox'),
+  ]

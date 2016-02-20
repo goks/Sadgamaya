@@ -22,8 +22,12 @@
     <br>
     Friend's email: <input id="Suma" type="email" name="Email" value=""><br>
     <button onclick="submit()">
-      Submit
+      Text Chat
     </button>
+    <button onclick="vidSubmit()">
+      Video Chat
+    </button>
+
 	</div>
 	
 </div>
@@ -34,7 +38,7 @@
                         // peer.on('open', function(id) {
                         //   console.log('My peer ID is: ' + id);
                           Email = document.getElementById("Suma").value;
-                        $.post('/tokenpass/', {'friendsEmail=':Email },function(data){
+                        $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'chat' },function(data){
                           switch(data){
                             case '0': alert("ERROR");
                                     break;
@@ -50,9 +54,32 @@
                         } );
                        // });
                        
-    }                    
-      // You can pick your own id or omit the id if you want to get a random one from the server. </script>
-      <script type="text/javascript">
+    }            
+     function vidSubmit(){
+                        // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
+                        // peer.on('open', function(id) {
+                        //   console.log('My peer ID is: ' + id);
+                          Email = document.getElementById("Suma").value;
+                        $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'video' },function(data){
+                          switch(data){
+                            case '0': alert("ERROR");
+                                    break;
+                            case '1': window.location.replace("/vidbox");
+                                    break;
+                            case '2': alert("Friend not a winky user");
+                                    break;
+                            case '3': alert("Friend already in another chat, pls wait!");
+                                    break;
+                            default: console.log("Not from winky server!!!");
+                                      console.log(data)                        
+                          }
+                        } );
+                       // });
+                       
+    }
+    </script> 
+    <script type="text/javascript">                   
+      // You can pick your own id or omit the id if you want to get a random one from the server. 
       $(document).ready(function(){
             // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
             // peer.on('open', function (id) {
@@ -68,10 +95,15 @@
                                                         }
                                             else if(data==1)
                                                           window.location.replace("/chatbox");
+                                            else if(data==2)
+                                                          window.location.replace("/vidbox");            
                                           });
                                           }  
                           soman();
              });
+
+
       </script>
+
   </body>
 </html>

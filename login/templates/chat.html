@@ -3,7 +3,7 @@
 <html>
 <head>
 
-	<title>WebRTC</title>
+	<title>Chat | Winky</title>
 	<script src="http://cdn.peerjs.com/0.3/peer.js"></script>
 
 	<style>
@@ -93,7 +93,7 @@
 <body>
 
 <div class="toolbar">Winky</div>
-<p class="myIdtxt">Peer id : <span class="myId">{{friendtoken}}</span></p>
+<p class="myIdtxt">Peer id : <span class="myId">{{mytoken}}</span></p>
 <p class="connectionStatus">Connecting ...</p>
 
 <div class="chatBox">
@@ -119,7 +119,7 @@
 
 <script>
 var myId = '{{mytoken}}'
-var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r'});
+var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3});
 var connectTextBox = $('.connect');
 var connectionStatus = $('.connectionStatus');
 var templateFrom = $('.msgTemplateFrm');
@@ -154,7 +154,7 @@ var receiver = '{{receiver}}'
         // connect();
 //     }
 // }
-if(receiver=='False'){
+if(receiver==0){
 	
 	console.log("Client is chat activator")
 }
@@ -175,12 +175,9 @@ function connect (argument) {
 	  connectionStatus.textContent = "connected";
 	  //alert("Connected");
 	});
-	console.log(friendID);
-	console.log(myId);
+	console.log("Friend=" + friendID);
+	console.log("Myid =" + myId);
 }
-
-
-
 
 
 peer.on('connection', function(conn) {
@@ -199,6 +196,12 @@ peer.on('connection', function(conn) {
 function $ (argument) {
 	return document.querySelector(argument);
 }
+peer.on('error', function(err){
+      alert(err.message);
+      connectionStatus.textContent = "Error";
+      // Return to step 2 if error occurs
+      
+    });
 
 
 

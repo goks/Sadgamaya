@@ -1,0 +1,218 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Videochat | Winky</title>
+	<!-- <script src="http://cdn.peerjs.com/0.3/peer.js"></script> -->
+	<script type="text/javascript" src="{% static "js/peer.js" %}"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+
+	<style>
+	html,body
+	{
+		margin:0;
+		padding: 0;
+		font-family: Roboto,sans-serif;
+	}
+
+	body
+	{
+		width: 100%;
+		min-height: 100vh;
+		padding-bottom: 32px;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+	}
+	.toolbar
+	{
+		width: 100%;
+		background: lightgreen;
+		height: 64px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	#their-video {
+  		width: 100%;
+  		height: 75%;
+  		max-height: 480px;
+  		background-color: #eee;
+	}
+
+	#video-container {
+  		padding: 25px;
+  		text-align: center;
+	}
+
+	#my-id {
+  		font-weight: bold;
+	}
+
+	#my-video {
+  		margin-top: 15px;
+  		width: 280px;
+  		height: auto;
+		background-color: #eee;
+	}
+
+
+	</style>
+</head>
+<body>
+	<div class="toolbar">Winky</div>
+	<p class="myIdtxt">Peer id : <span class="myId">{{mytoken}}</span></p>
+
+  
+
+      <!-- Video area -->
+      <div  id="video-container">
+        <video id="their-video" autoplay=""></video>
+        <video id="my-video" muted="true" autoplay=""></video>
+        <!-- <video id="video" width="640" height="480" autoplay></video> -->
+
+      </div>
+
+    
+          <p>Your id: <span id="my-id"></span></p>
+          <p id="connectionStatus">Connecting...</p>
+       
+     
+</body>	
+<script>
+// var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+// var constraints = {audio: false, video: true};
+// var video = document.querySelector('');
+
+// function successCallback(stream) {
+//   window.stream = stream; // stream available to console
+//   if (window.URL) {
+//     video.src = window.URL.createObjectURL(stream);
+//   } else {
+//     video.src = stream;
+//   }
+// }
+
+// function errorCallback(error){
+//   console.log("navigator.getUserMedia error: ", error);
+// }
+
+// navigator.getUserMedia(constraints, successCallback, errorCallback);
+// // isIdready();
+ 
+ 
+</script>
+<script type="text/javascript">
+
+		var myId = '{{mytoken}}';
+		var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 4});
+		var connectionStatus = $('#connectionStatus');
+		var receiver = '{{receiver}}';
+		var friendID = '{{friendtoken}}';
+		var receiver = '{{receiver}}';
+		//var window.vidstream ;
+
+		$('#my-id').html(myId);
+		window.getUserMediaStatus=0;
+
+	window.addEventListener("DOMContentLoaded", function() {
+
+		video = document.getElementById("my-video"),
+		videoObj = { "video": true },
+		errBack = function(error) {
+			console.log("Video capture error: ", error.code); 
+			window.getUserMediaStatus = 1;
+		};
+
+	// Put video listeners into place
+	if(navigator.getUserMedia) { // Standard
+		navigator.getUserMedia(videoObj, function(stream) {
+			video.src = stream;
+			video.play();
+			sivan(stream);
+		}, errBack);
+	 } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
+		navigator.webkitGetUserMedia(videoObj, function(stream){
+			video.src = window.webkitURL.createObjectURL(stream);
+			video.play();
+			sivan(stream);
+		}, errBack);
+	}
+	else if(navigator.mozGetUserMedia) { // Firefox-prefixed
+		navigator.mozGetUserMedia(videoObj, function(stream){
+			video.src = window.URL.createObjectURL(stream);
+			video.play();
+			window.vidstream = stream;
+			console.log(window.vidstream);
+			sivan(stream);
+
+		}, errBack);
+	}
+
+	// console.log("ivide keri");
+	function sivan(vidstream){
+		window.getUserMediaStatus=1;
+		if(receiver==0)
+		{
+			console.log(myId + " Call requests" + friendID);
+			var call = peer.call(friendID, vidstream);
+			call.on('stream', function(stream){
+        		$('#their-video').prop('src', URL.createObjectURL(stream));
+        		connectionStatus.html("Connected");
+      			});
+			console.log("VILI POI");
+
+		}
+	}
+
+	if(receiver==0){
+	
+	console.log("Client is chat activator");
+	console.log("friendIDis" + friendID);
+	
+	}
+	else
+		console.log("Client is chat receiver");
+	
+}, false);
+
+
+
+
+	peer.on('call', function(call) {
+  	// Answer the call, providing our mediaStream
+	//call.answer(mediaStream);
+	console.log("VILI VANNU");
+	connectionStatus.html("Connected");
+	console.log("localstream of receiver" + window.vidstream);
+	function waitforvidstream(){
+	if(window.getUserMediaStatus==1){
+		if(window.vidstream!=null){
+			call.answer(window.vidstream);
+			console.log("RETURNED WITH VIDEOSTREAM");
+		}
+		else
+			call.answer();
+		}
+	else{
+		window.setTimeout(waitforvidstream, 500);
+	}	
+	}
+	waitforvidstream();
+	call.on('stream', function(stream) {
+	 	$('#their-video').prop('src', URL.createObjectURL(stream));
+  		// `stream` is the MediaStream of the remote peer.
+  		// Here you'd add it to an HTML video/canvas element.
+		});
+	// $('#their-id').text(call.peer);
+	});
+
+	peer.on('error', function(err){
+      alert(err.message);
+     });
+</script>
+</html>
