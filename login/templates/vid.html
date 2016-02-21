@@ -124,8 +124,9 @@
 		video = document.getElementById("my-video"),
 		videoObj = { "video": true },
 		errBack = function(error) {
-			console.log("Video capture error: ", error.code); 
+			console.log("	Video capture error: ", error.code); 
 			window.getUserMediaStatus = 1;
+			alert("Your Browser has issues with getUserMedia.");
 		};
 
 	// Put video listeners into place
