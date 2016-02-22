@@ -29,22 +29,24 @@ def index(request):
 @csrf_exempt
 def auth(request):
 	#userid = request.POST.get('iduser=', 'NULL')
- 	token = request.POST.get('idtoken=', 'NULL')
- 	# firstname = request.POST.get('idfirstname=', 'NULL')
- 	# lastname = request.POST.get('idlastname=', 'NULL')
- 	# email = request.POST.get('idemail=', 'NULL')
- 	#  imageurl = request.POST.get('idimageurl=','NULL')
+	print ("hello")
+	token = request.POST.get('idtoken=', 'NULL')
 
- # 	proxy = urllib2.ProxyHandler({'https': 'http://mec:mec@192.168.0.4:3128'})
+	# proxy = urllib2.ProxyHandler({'https': 'http://mec:mec@192.168.0.4:3128'})
 	# auth = urllib2.HTTPBasicAuthHandler()
 	# opener = urllib2.build_opener(proxy, auth, urllib2.HTTPHandler)
 	# urllib2.install_opener(opener)
 
- 	url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token
+	if(token=='NULL'):
+		return HttpResponse("fail")
+
+	url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token
  	req = urllib2.Request(url)
  	response = urllib2.urlopen(req)
  	response = json.load(response)
- 	# print response
+ 	print response
+
+ 	
  	if response['aud']=='841750429424-1hba7bekjmrm1ngbn3m2hrlfb44fodgu.apps.googleusercontent.com':
  		firstname = response['given_name']
  		lastname = response['family_name']
@@ -57,17 +59,7 @@ def auth(request):
  	 	print ">>>>JSON PARSE COMPLETE"
  	else:
  		return HttpResponse("fail")
- 	# url= 'https://www.googleapis.com/plus/v1/people/'+userid+'/people/connected'	
- 	# req = urllib2.Request(url)
- 	# response = urllib2.urlopen(req)
- 	# print response
-  #   # set the body
-    #r = HttpResponse(response.read())
-#
-    # set the headers
-    #for header in response.info().keys():
-        # r[header] = response.info()[header]
- 
+ 	
     #url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token+'/'
  	#serialized_data = urllib2.urlopen(url).read()
  	#data = json.loads(serialized_data)
@@ -97,9 +89,6 @@ def auth(request):
 	request.session['email'] = email
 	request.session['dashboard']=1
 	print ">>>passed Oauth"
-	# print ">>>NOW IS: "+ datetime.datetime.now().strftime('%m/%d/%Y')
-	#request.session['login'] = 1
-	#return HttpResponse("firstname: " + firstname +"\nlastname: " + lastname + "\nemail: " + email +"\nimageurl: " + imageurl)
 	context=RequestContext(request)
 	return HttpResponse("1")
 
@@ -123,9 +112,7 @@ def dash(request):
  
 @csrf_exempt    		
 def tokenpass(request):
-	#userid = request.POST.get('iduser=', 'NULL')
- 	# token = request.POST.get('token=', 'NULL')
- 	email = request.session['email']
+	email = request.session['email']
  	friendsEmail = request.POST.get('friendsEmail=', 'NULL')
  	chatType = request.POST.get('type=', 'NULL')
 	print ">>>friendsEmail: " + friendsEmail

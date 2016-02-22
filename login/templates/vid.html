@@ -131,20 +131,20 @@
 
 	// Put video listeners into place
 	if(navigator.getUserMedia) { // Standard
-		navigator.getUserMedia(videoObj, function(stream) {
+		navigator.getUserMedia({audio: true, video: true}, function(stream) {
 			video.src = stream;
 			video.play();
 			sivan(stream);
 		}, errBack);
 	 } else if(navigator.webkitGetUserMedia) { // WebKit-prefixed
-		navigator.webkitGetUserMedia(videoObj, function(stream){
+		navigator.webkitGetUserMedia({audio: true, video: true}, function(stream){
 			video.src = window.webkitURL.createObjectURL(stream);
 			video.play();
 			sivan(stream);
 		}, errBack);
 	}
 	else if(navigator.mozGetUserMedia) { // Firefox-prefixed
-		navigator.mozGetUserMedia(videoObj, function(stream){
+		navigator.mozGetUserMedia({audio: true, video: true}, function(stream){
 			video.src = window.URL.createObjectURL(stream);
 			video.play();
 			window.vidstream = stream;

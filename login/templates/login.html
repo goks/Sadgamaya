@@ -59,6 +59,8 @@ function onSuccess(googleUser) {
               ,function(data) {
                          		if(data == 1)
                          			window.location.replace("/dash");
+                            else
+                              alert("Cannot redirect, auth error"+data);
                         		
                              }
                              );
@@ -118,40 +120,7 @@ function renderButton() {
         </script>
 
     
-    <!-- <script>
-  //    function onSignIn(googleUser) {
-  // var profile = googleUser.getBasicProfile();
-  // var id_user = profile.getId() ;
-  // var id_token =  googleUser.getAuthResponse().id_token;
-  // var id_firstname = profile.getGivenName();
-  // var id_lastname = profile.getFamilyName();
-  // var id_imageurl = profile.getImageUrl();
-  // var id_email = profile.getEmail();
-  // console.log('ID: ' + id_token); // Do not send to your backend! Use an ID token instead.
-  // console.log('Name: ' + id_firstname);
-  // console.log('Image URL: ' + id_imageurl);
-  // console.log('Email: ' + id_email);
-  // successanimation();
-  //var xhr = new XMLHttpRequest();
-//xhr.open('POST', 'http://localhost:8000/auth/');
-//xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-//xhr.onload = function() {
- // console.log('Signed in as: ' + xhr.responseText);
-//};
-//xhr.send('idtoken=' + id_token);
-//};
-// jQuery.post('http://localhost:8000/auth/', {'idtoken=':id_token 
-// 	//,'iduser=':id_user, 'idfirstname=':id_firstname,'idlastname=':id_lastname, 'idemail=':id_email, 'idimageurl=':id_imageurl
-// 			} 
-
-//               ,function(data) {
-//                          		if(data == 1)
-//                          			window.location.replace("/dash");
-                        		
-//                              }
-//                              );
-// };
-//     </script>-->
+   
      <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
   </body>
 </html>
