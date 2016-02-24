@@ -6,6 +6,7 @@
     <title>Welcome | Winky</title>
     
    <script type="text/javascript" src="{% static "js/peer.js" %}"></script>
+   <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
 
     
     
@@ -27,6 +28,10 @@
     <button onclick="vidSubmit()">
       Video Chat
     </button>
+    <div id=friendsDiv>
+    <h3>Friendslist</h3>
+   
+   </div>
 
 	</div>
 	
@@ -103,7 +108,33 @@
              });
 
 
-      </script>
+     </script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var friend = "{{friends}}";
+   // alert(friend);
+  friends=friend.toString();
+  friends = friends.split(" ");
+  appu = document.getElementById("friendsDiv");
+  // alert(friends);
+  for(i=0; i<friends.length; i++){
+    var a = document.createElement('A');
+     // var createTextNode(friends[i]);
+     a.innerHTML = friends[i];
+     a.setAttribute('class','friendEmail');
+     a.setAttribute('href','#')
+     appu.appendChild(a);
+     appu.appendChild(document.createElement('BR'));
+
+  }
+  
+  
+ $('.friendEmail').click(function(){ document.getElementById("Suma").value = $(this).text()});
+    
+});
+
+
+</script>
 
   </body>
 </html>

@@ -107,7 +107,7 @@ def dash(request):
     	u.chatactive = False
     	userid = u.firstName+" "+u.lastName
     	print u.token
-    	return render_to_response('dash.html',{'userid':userid},context)
+    	return render_to_response('dash.html',{'userid':userid, 'friends':u.friendslist},context)
     return redirect('index')
  
 @csrf_exempt    		
