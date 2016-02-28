@@ -1,0 +1,140 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Welcome | Winky</title>
+    
+   <script type="text/javascript" src="{% static "js/peer.js" %}"></script>
+   <script type="text/javascript" src="https://code.jquery.com/jquery-2.2.1.min.js"></script>
+
+    
+    
+  </head>
+
+  <body> 
+
+    <div class="wrapper">
+	<div class="container">
+		<h1>Welcome</h1>
+		<p>Your User Id is {{userid}}</p>
+		<br>
+		<p>Your Room no is </p><p id="nishi"></p>
+    <br>
+    Friend's email: <input id="Suma" type="email" name="Email" value=""><br>
+    <button onclick="submit()">
+      Text Chat
+    </button>
+    <button onclick="vidSubmit()">
+      Video Chat
+    </button>
+    <div id=friendsDiv>
+    <h3>Friendslist</h3>
+   
+   </div>
+
+	</div>
+	
+</div>
+    <script src='//cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+    <script type="text/javascript">
+    function submit(){
+                        // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
+                        // peer.on('open', function(id) {
+                        //   console.log('My peer ID is: ' + id);
+                          Email = document.getElementById("Suma").value;
+                        $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'chat' },function(data){
+                          switch(data){
+                            case '0': alert("ERROR");
+                                    break;
+                            case '1': window.location.replace("/chatbox");
+                                    break;
+                            case '2': alert("Friend not a winky user");
+                                    break;
+                            case '3': alert("Friend already in another chat, pls wait!");
+                                    break;
+                            default: console.log("Not from winky server!!!");
+                                      console.log(data)                        
+                          }
+                        } );
+                       // });
+                       
+    }            
+     function vidSubmit(){
+                        // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
+                        // peer.on('open', function(id) {
+                        //   console.log('My peer ID is: ' + id);
+                          Email = document.getElementById("Suma").value;
+                        $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'video' },function(data){
+                          switch(data){
+                            case '0': alert("ERROR");
+                                    break;
+                            case '1': window.location.replace("/vidbox");
+                                    break;
+                            case '2': alert("Friend not a winky user");
+                                    break;
+                            case '3': alert("Friend already in another chat, pls wait!");
+                                    break;
+                            default: console.log("Not from winky server!!!");
+                                      console.log(data)                        
+                          }
+                        } );
+                       // });
+                       
+    }
+    </script> 
+    <script type="text/javascript">                   
+      // You can pick your own id or omit the id if you want to get a random one from the server. 
+      $(document).ready(function(){
+            // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
+            // peer.on('open', function (id) {
+            //               document.getElementById('nishi').innerHTML= id;  
+                          function soman(){
+                                            $.post('/chatcheck/', function(data){
+                                            if(data==0){
+                                                          var delay=2000; 
+                                                          setTimeout(function(){
+                                                                                  soman();  
+                                                                                  //alert("1");
+                                                                                }, delay); 
+                                                        }
+                                            else if(data==1)
+                                                          window.location.replace("/chatbox");
+                                            else if(data==2)
+                                                          window.location.replace("/vidbox");            
+                                          });
+                                          }  
+                          soman();
+             });
+
+
+     </script>
+<script type="text/javascript">
+$(document).ready(function(){
+  var friend = "{{friends}}";
+   // alert(friend);
+  friends=friend.toString();
+  friends = friends.split(" ");
+  appu = document.getElementById("friendsDiv");
+  // alert(friends);
+  for(i=0; i<friends.length; i++){
+    var a = document.createElement('A');
+     // var createTextNode(friends[i]);
+     a.innerHTML = friends[i];
+     a.setAttribute('class','friendEmail');
+     a.setAttribute('href','#')
+     appu.appendChild(a);
+     appu.appendChild(document.createElement('BR'));
+
+  }
+  
+  
+ $('.friendEmail').click(function(){ document.getElementById("Suma").value = $(this).text()});
+    
+});
+
+
+</script>
+
+  </body>
+</html>

@@ -12,6 +12,7 @@ import urllib2
 import json
 import datetime
 import time
+from addlclasses import Friend
 # Create your views here.
 
 #======Index Page======#
@@ -107,7 +108,18 @@ def dash(request):
     	u.chatactive = False
     	userid = u.firstName+" "+u.lastName
     	print u.token
-    	return render_to_response('dash.html',{'userid':userid, 'friends':u.friendslist},context)
+    	friendslist = []
+    	if u.friendslist:
+    		friends = u.friendslist
+    		friends = friends.split(' ')
+    		for friend in friends:
+    			m = User.objects.get(email = friend)
+    			friendslist.append(Friend(m.firstName+' '+m.lastName, '1', m.imageurl, m.email))
+    			print m.email
+    	else:
+    		friendslist = NULL
+    	# print friendslist[0].fullname			
+    	return render_to_response('dash.html',{'userid':userid, 'friends':friendslist, 'image':u.imageurl, 'myemail':u.email},context)
     return redirect('index')
  
 @csrf_exempt    		
