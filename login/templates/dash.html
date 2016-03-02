@@ -12,6 +12,9 @@
 <!--        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
         <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
+        <script type="text/javascript" src="{% static "js/peercode.js" %}">
+        </script>
         <style>
             @import url(https://fonts.googleapis.com/css?family=Lato:400,700);
             *, *:before, *:after {
@@ -146,14 +149,18 @@
         <div class="container">
             <div class="row">
             <div class="people-list col-xs-3" id="people-list">
-                <ul class="list-unstyled">
+                <ul class="list-unstyled" id="friendsList">
                   {% for friend in friends %}
                     <li class="chatPerson">
                       <img class="chatmem" src="{{ friend.imageurl }}" alt="avatar" />
                       <div class="about hidden-xs">
                         <div class="name ">{{ friend.fullname }}</div>
                         <div class="status">
-                          <i class="fa fa-circle online"></i> online
+                        {% if friend.online %}
+                          <i class="fa fa-circle online"></i> <span class="statusText">online</span>
+                        {% else %}
+                          <i class="fa fa-circle offline"></i> <span class="statusText">offline</span>
+                        {% endif %}
                         </div>
                       </div>
                       <div class="friendEmail">{{ friend.email }}</div>
@@ -343,5 +350,64 @@
             $('#myModal').modal();
         });
     </script>    
+    <script type="text/javascript">
+          // var myId = '{{mytoken}}'
+          // var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 2});
+          // var connectTextBox = $('.connect');
+          // var connectionStatus = $('.connectionStatus');
+          // var templateFrom = $('.msgTemplateFrm');
+          // var templateTo = $('.msgTemplateTo');
+          // var chatBox = $('.chatBox');
+          // var msgBox = $('.msgBox');
+          // var connectedPeer;
+
+          // var delay = 3000;
+          // var friendsId = [];
+          // var i = 0;
+          //  {% for friend in friends %}
+
+          //     friendsId[i++] = '{{friend.id}}';
+             
+          //  {% endfor %}
+
+
+          // // function vada(){
+          //             var runner = 0;
+          //             var shibu = document.getElementsByClassName("status");
+          //             setTimeout(function(){
+          //                     while(runner<friendsId.length){
+                                 
+          //                                  try{
+          //                                        //connectedPeer = peer.connect(friendsId[runner]);
+          //                                      }
+          //                                  catch(e){
+          //                                      alert(e);
+          //                                          } 
+                                        
+          //                      } 
+
+          //              },delay);              
+          // }
+
+           
+  //$('#friendsList').find('.status').find('.online').removeClass('online').addClass('offline');
+  //$('#friendsList').find('.statusText').html("offline");
+
+
+            //while(1){
+           //setTimeout(function(){
+            // $(document).ready(function(){
+            //     vada();  
+            //     }
+            //   );
+                                   
+                                   //alert("1");
+            //                    }, delay); 
+                                                        
+         // }
+
+
+         
+    </script>
     </body>
 </html>    

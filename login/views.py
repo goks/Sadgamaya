@@ -1,5 +1,5 @@
 from django.shortcuts import render, render_to_response
-from models import User
+from models import User, Onlinelist
 from django.http import HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import ensure_csrf_cookie,csrf_exempt
 from django.template import RequestContext, loader
@@ -107,19 +107,34 @@ def dash(request):
     	u = User.objects.get(email=request.session['email'])
     	u.chatactive = False
     	userid = u.firstName+" "+u.lastName
-    	print u.token
+    	# print u.token
     	friendslist = []
     	if u.friendslist:
     		friends = u.friendslist
     		friends = friends.split(' ')
     		for friend in friends:
     			m = User.objects.get(email = friend)
-    			friendslist.append(Friend(m.firstName+' '+m.lastName, '1', m.imageurl, m.email))
+    			try:
+    				s = Onlinelist.objects.get(user=m)
+    				print"Friend in onlineDB"
+    				try:
+    					if(s.get_time_diff()<120):
+    						online=True
+    					else:
+    						online=False
+    					# print ">>>"+m.firstName+"seconds:"+s.get_time_diff()
+    				except:
+    					print"Error in getting timediff"	
+    			except:
+    				print "Friend not in onlineDB"
+    				online=False
+    			print s.get_time_diff()	
+    			friendslist.append(Friend(m.firstName+' '+m.lastName, '1', m.imageurl, m.email, online))
     			print m.email
-    	else:
-    		friendslist = NULL
+    	# else:
+    	# 	friendslist = 'NULL' 
     	# print friendslist[0].fullname			
-    	return render_to_response('dash.html',{'userid':userid, 'friends':friendslist, 'image':u.imageurl, 'myemail':u.email},context)
+    	return render_to_response('dash.html',{'userid':userid, 'friends':friendslist, 'image':u.imageurl, 'myemail':u.email, 'mytoken':u.token},context)
     return redirect('index')
  
 @csrf_exempt    		
@@ -193,11 +208,15 @@ def chatcheck(request):
    		# u.token = token;
    		u.beacon = datetime.datetime.now()
    		u.save()
- 		print ">>>receiver is: "+ u.firstName
-   		print ">>Token in Database"
+ 		# print ">>>receiver is: "+ u.firstName
    	except:
    		print ">>Error adding token to db"
    		return HttpResponse("3")
+   	try:
+   		s = Onlinelist.objects.get(user=u)
+   	except:
+   		s = Onlinelist(user=u)
+   	s.save()	
    	#	while True :
    	receiver = request.session['receiver'] 
    	if (u.chatactive):
