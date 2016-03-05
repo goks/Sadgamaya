@@ -11,4 +11,3 @@ Todo:
 
 1: File Sharing
 2: jquery search bar
-3: online/offline status
