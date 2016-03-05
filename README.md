@@ -10,4 +10,4 @@ Status : Work in progress!
 Todo:
 
 1: File Sharing
-2: jquery search bar
+2: UI Upgrade
