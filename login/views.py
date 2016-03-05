@@ -232,7 +232,7 @@ def chatcheck(request):
    				s = Onlinelist.objects.get(user=m)
    				print"Chatcheck:Friend in onlineDB"
    				try:
-   					if(s.get_time_diff()<120):
+   					if(s.get_time_diff()<20):
    						online=True
    					else:
    						online=False
