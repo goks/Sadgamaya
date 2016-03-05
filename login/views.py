@@ -12,7 +12,8 @@ import urllib2
 import json
 import datetime
 import time
-from addlclasses import Friend
+from addlclasses import Friend, ShortFriend
+from django.core import serializers
 # Create your views here.
 
 #======Index Page======#
@@ -118,7 +119,7 @@ def dash(request):
     				s = Onlinelist.objects.get(user=m)
     				print"Friend in onlineDB"
     				try:
-    					if(s.get_time_diff()<120):
+    					if(s.get_time_diff()<30):
     						online=True
     					else:
     						online=False
@@ -218,18 +219,64 @@ def chatcheck(request):
    		s = Onlinelist(user=u)
    	s.save()	
    	#	while True :
+   	friendslist = []
+   	# friendarray = []
+   	if u.friendslist:
+   		friends = u.friendslist
+    	friends = friends.split(' ')
+    	for friend in friends:
+   			m = User.objects.get(email = friend)
+   			try:
+   				s = Onlinelist.objects.get(user=m)
+   				print"Chatcheck:Friend in onlineDB"
+   				try:
+   					if(s.get_time_diff()<120):
+   						online=True
+   					else:
+   						online=False
+   					# print ">>>"+m.firstName+"seconds:"+s.get_time_diff()
+   				except:
+   					print"Error in getting timediff"	
+   			except:
+   				print "Friend not in onlineDB"
+  				online=False
+   			print s.get_time_diff()
+   			# friendarray = ['email:'+m.email,online]
+   			friendslist.append(ShortFriend(m.email,online))
    	receiver = request.session['receiver'] 
+
    	if (u.chatactive):
    			print ">>"+u.firstName+" CHAT ACTIVE"
    			request.session['receiver'] = 1
    			request.session['chatbox']=1
    			if(u.chattype == "chat"):
-   					return HttpResponse('1')
+   					response = 1
    			elif(u.chattype == "video"):
-   					return HttpResponse('2')
+   					response = 2
+   			# friendslist.append(ShortFriend('response',response))
+   			# c = ChatCheckFriend(response,friendslist)
+   			# serializers.serialize('json', friendslist)
+   			# print friendslist
+   			# return HttpResponse(friendslist, content_type='application/json')
    	else :
    			print ">>"+u.firstName+"RECEIVER WAITING FOR CHAT"
-   			return HttpResponse('0')
+   			response = 0
+   			# friendslist.append(ShortFriend('response',response))
+   			# print friendslist
+   			# serializers.serialize("json", friendslist)
+   			# serializers.serialize('json', friendslist)
+   			# json.dumps(friendslist.__dict__)
+   			# print friendslist
+   			# c = ChatCheckFriend(response,friendslist)
+   			# return HttpResponse(friendslist, content_type='application/json')
+   	def obj_dict(obj):
+		return obj.__dict__		
+   	friendslist.append(ShortFriend('response',response))		
+   	# for obj in friendslist:
+   		# friendsJson = json.dumps(obj.__dict__)
+   	friendsJson = json.dumps(friendslist, default=obj_dict,  indent=4, separators=(',', ': '))
+   	print json.dumps(friendslist, default=obj_dict,  indent=4, separators=(',', ': '))
+   	return HttpResponse(friendsJson, content_type='application/json')		
    	return HttpResponse("Error")
 
 @csrf_exempt
