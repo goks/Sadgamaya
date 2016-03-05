@@ -6,6 +6,7 @@
          <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <!--         <meta name="viewport" content="width=device-width, initial-scale=1">-->
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+         <meta name="google-signin-client_id" content="841750429424-1hba7bekjmrm1ngbn3m2hrlfb44fodgu.apps.googleusercontent.com">
         <title>Dash | Winky</title>
     
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
@@ -49,6 +50,16 @@
                 }
                 .navbar-left{
                     width: 100%;
+                }
+                .coolcolor-online{
+                  border: #7AE052;
+                  border-style: solid;
+                  border-width: 5px;
+                }
+                .coolcolor-offline{
+                  border: #E38968;
+                  border-style: solid;
+                  border-width: 5px;
                 }
             }
             .people-list {
@@ -106,6 +117,16 @@
             #callFriendEmail{
               display: none;
             }
+            #Signoutbut{
+              background-color: transparent;
+              padding: none;
+            }
+            #signoutmenu{
+              opacity: 0.6;
+            }
+            #searchresult>li{
+              cursor: pointer;
+            }
         </style>
     </head>
     <body>
@@ -125,7 +146,10 @@
 <!--              <div class="form-group">-->
                  <div class="input-group" style="width:30%;">
                     <span class="input-group-addon"><i class="fa fa-search fa-fw"></i></span>
-                    <input type="search" id="searchBar" class="form-control" placeholder="Search people">
+                    <input type="search" id="searchBar" data-toggle="dropdown" class="form-control" placeholder="Search people">
+                    <ul class="dropdown-menu" id="searchresult" aria-labelledby="dLabel">
+                      
+                    </ul>
                  </div>
                 
 <!--              </div>-->
@@ -134,6 +158,11 @@
             <br>
             <img style="display:inline-block;" alt="usr" id='avatar' src="{{image}}">
             <p style="display:inline-block;color:white;font-size: medium; opacity:0.9;">{{userid}}</p>
+            <button class="btn" id="Signoutbut" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span class="caret"></span></button>
+            <ul class="dropdown-menu" id="signoutmenu" aria-labelledby="dLabel">
+            <li><a href="#" onclick="signOut();">Signout</a></li>
+            </ul>
+            
           </div>
         </div><!--/.navbar-collapse -->
       </div>
@@ -152,7 +181,12 @@
                 <ul class="list-unstyled" id="friendsList">
                   {% for friend in friends %}
                     <li class="chatPerson">
-                      <img class="chatmem" src="{{ friend.imageurl }}" alt="avatar" />
+                      {% if friend.online %}
+                        <img class="chatmem coolcolor-online" src="{{ friend.imageurl }}" alt="avatar" />
+                      {% else %}
+                        <img class="chatmem coolcolor-offline" src="{{ friend.imageurl }}" alt="avatar" />
+                        {% endif %}
+                      
                       <div class="about hidden-xs">
                         <div class="name ">{{ friend.fullname }}</div>
                         <div class="status">
@@ -165,17 +199,8 @@
                       </div>
                       <div class="friendEmail">{{ friend.email }}</div>
                     </li>
-                  {% endfor %}  
-                   <!--  <li class="chatPerson">
-                      <img class="chatmem" src="{% static 'images/chatfriend.png' %}" alt="avatar" />
-                      <div class="about hidden-xs">
-                        <div class="name">Manu AVS</div>
-                        <div class="status">
-                          <i class="fa fa-circle online"></i> online
-                        </div>
-                      </div>
-                      <div class="friendEmail">pqr@gmail.com</div>
-                    </li> -->
+                  {% endfor %} 
+                  
                     <hr>
        
                 </ul>
@@ -195,7 +220,7 @@
                     <div role="tabpanel" class="tab-pane active" id="home">
                         <br>
                        <p> Click on any tab to start a conversation.</p>
-                        <!-- <button type="button" data-toggle="modal" data-target="#myModal">Launch modal</button> -->
+                        <!-- <button id="searchme">search me</button> -->
                     </div>
                     <div role="tabpanel" class="tab-pane" id="textChat">
                        <div class="form-group">
@@ -335,9 +360,9 @@
                                                                                 }, delay); 
                                                         }
                                             else if(data==1)
-                                                          window.location.replace("/chatbox");
+                                                          window.location.href = "/chatbox";
                                             else if(data==2)
-                                                          window.location.replace("/vidbox");
+                                                          window.location.href = "/vidbox";
                                             else 
                                                           alert (data);
                                             
@@ -345,23 +370,18 @@
                                             var i=0;
                                             //var ids = $('.chatPerson').find('.friendEmail').toArray() ;
                                             while(i<obj.length-1){
-                                              //alert($('.chatPerson').find('.friendEmail').text());
-                                              // j=0;
-                                              // while(j<ids.length){
-                                              //   alert("keri");
-                                              //   alert(ids[j]);
-                                              //    if(ids[j]==obj[i].email){
-                                              //    alert("hello");
-                                              //     }
-                                              //  j++;
-                                               // }
-                                                $('.chatPerson').each(function(){
+                                              $('.chatPerson').each(function(){
                                                   var eli = $(this);
                                                   if($(eli).find('.friendEmail').text()==obj[i].email){
-                                                    if(obj[i].status==true)
+                                                    if(obj[i].status==true){
+
+                                                          $(eli).find('.chatmem').removeClass('coolcolor-offline').addClass('coolcolor-online');
                                                           $(eli).find('.status').html("<i class=\"fa fa-circle online\"></i> <span class=\"statusText\">online</span>");
-                                                    else      
-                                                    $(eli).find('.status').html("<i class=\"fa fa-circle offline\"></i> <span class=\"statusText\">offline</span>");
+                                                    }      
+                                                    else{
+                                                          $(eli).find('.chatmem').removeClass('coolcolor-online').addClass('coolcolor-offline');
+                                                          $(eli).find('.status').html("<i class=\"fa fa-circle offline\"></i> <span class=\"statusText\">offline</span>");
+                                                  }
                                                 }
 
                                               });
@@ -382,9 +402,56 @@
             $('#callFriend').html( $(this).find('.name  ').text() );
             $('#myModal').modal();
         });
-    </script>    
+    </script>   
+     
     <script type="text/javascript">
-          
+          function signOut() {
+             var auth2 = gapi.auth2.getAuthInstance();
+             auth2.signOut().then(function () {
+               console.log('User signed out.');
+               location.reload();
+             });
+          }
+          function onLoad() {
+            gapi.load('auth2', function() {
+              gapi.auth2.init();
+            });
+          }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
+    
+    <script type="text/javascript">
+      $('#searchBar').keyup(function(){
+        var anb = $('#searchBar').val();
+        $('#searchresult').html('');
+        if(anb)
+          $.get("/search", {query: anb},function(data, status){
+            //alert(anb);
+            var i = 0;
+            //alert(status + data.length );
+            while(i<data.length && status=='success')
+            {
+              $('#searchresult').append('<li>'+data[i].fields.firstName+' '+data[i].fields.lastName+"<span class='hidden'>"+data[i].pk+'</span'+'</li>');
+              ravi();
+              //alert(data[i].pk);
+              i++;
+            }
+            if(!data.length)
+              $('#searchresult').html('NO RESULTS');
+          });
+      });
+      function ravi(){
+         $('#searchresult').find('li').click(function(){
+            //alert('hello');
+            $('#callFriendEmail').html($(this).find('span').text() );
+            $('#callFriend').html( $(this).contents().filter(function(){ return this.nodeType == 3; })[0].nodeValue);
+            $('#myModal').modal();
+            //alert($(this).find('span').text());
+         });
+
+      }
+     
+      //$(document).ready(function);
     </script>
     </body>
 </html>    

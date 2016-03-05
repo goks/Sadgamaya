@@ -24,8 +24,8 @@ class User(models.Model):
 	tempfriendtoken = models.CharField(max_length=254,null=True,default='0')
 	chattype = models.CharField(max_length=10, null=True)
 
-	def __str__(self, arg):
-		return self.email
+	# def __str__(self, arg):
+	# 	return self.email
 
 	
 

@@ -14,6 +14,8 @@ import datetime
 import time
 from addlclasses import Friend, ShortFriend
 from django.core import serializers
+from django.db.models import Q #for search
+from django.core.serializers.json import DjangoJSONEncoder
 # Create your views here.
 
 #======Index Page======#
@@ -252,30 +254,17 @@ def chatcheck(request):
    			if(u.chattype == "chat"):
    					response = 1
    			elif(u.chattype == "video"):
-   					response = 2
-   			# friendslist.append(ShortFriend('response',response))
-   			# c = ChatCheckFriend(response,friendslist)
-   			# serializers.serialize('json', friendslist)
-   			# print friendslist
-   			# return HttpResponse(friendslist, content_type='application/json')
+   					response = 2   			
    	else :
    			print ">>"+u.firstName+"RECEIVER WAITING FOR CHAT"
-   			response = 0
-   			# friendslist.append(ShortFriend('response',response))
-   			# print friendslist
-   			# serializers.serialize("json", friendslist)
-   			# serializers.serialize('json', friendslist)
-   			# json.dumps(friendslist.__dict__)
-   			# print friendslist
-   			# c = ChatCheckFriend(response,friendslist)
-   			# return HttpResponse(friendslist, content_type='application/json')
+   			response = 0   			
    	def obj_dict(obj):
-		return obj.__dict__		
+		return obj.__dict__
    	friendslist.append(ShortFriend('response',response))		
    	# for obj in friendslist:
    		# friendsJson = json.dumps(obj.__dict__)
    	friendsJson = json.dumps(friendslist, default=obj_dict,  indent=4, separators=(',', ': '))
-   	print json.dumps(friendslist, default=obj_dict,  indent=4, separators=(',', ': '))
+   	# print json.dumps(friendslist, default=obj_dict,  indent=4, separators=(',', ': '))
    	return HttpResponse(friendsJson, content_type='application/json')		
    	return HttpResponse("Error")
 
@@ -383,3 +372,19 @@ def vidbox(request):
 		print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token
 		return render_to_response('vid.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
 	return redirect('index')
+
+@csrf_exempt
+def search(request):
+	try:
+		q = request.GET['query']
+		response =User.objects.filter(Q(firstName__icontains=q) | Q(lastName__icontains=q) | Q(email__icontains=q))
+		print response
+		if(response):
+			temp_output = serializers.serialize('python', response)
+			output = json.dumps(temp_output, cls=DjangoJSONEncoder,indent=4, separators=(',', ': '))
+			print output
+			return HttpResponse(output, content_type='application/json')
+		# return HttpResponse(response)
+	except KeyError:
+		return HttpResponse('Error')
+	return HttpResponse('{}',content_type='application/json')

@@ -55,10 +55,10 @@ function onSuccess(googleUser) {
   console.log('Email: ' + id_email);
   successanimation();
   jQuery.post('/auth/', {'idtoken=':id_token } 
-
               ,function(data) {
                          		if(data == 1)
-                         			window.location.replace("/dash");
+                              window.location.href = "/dash";
+                         			// window.location.replace("/dash");
                             else
                               alert("Cannot redirect, auth error"+data);
                         		
