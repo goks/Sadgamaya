@@ -29,7 +29,7 @@
   <body>
   <div class="container">
   <div class="center">
-    <span class="status">text</span>
+    <span class="status">Connecting . . .</span>
   </div>
   </div>
   <ul class="chat-thread">
@@ -57,13 +57,16 @@
 
   $('.chat-window').submit(function () {
  	//sendContactForm();
- 	connectedPeer.send(msgBox.val());
-    var clone = '<li class="me">' + msgBox.val() + "</li>";
-    chatBox.append(clone);
-    msgBox.val(" ");
+ 	if(msgBox.val()!=''){
+ 		//alert(msgBox.val());
+	 	connectedPeer.send(msgBox.val());
+	    var clone = '<li class="me">' + msgBox.val() + "</li>";
+	    chatBox.append(clone);
+	    msgBox.val("");
+	}    
  	return false;
   });
-  connectionStatus.text('help');
+  //connectionStatus.text('help');
 
   if(receiver==0){    
     console.log("Client is chat activator")
@@ -72,7 +75,10 @@
     console.log("Client is chat receiver")
   }
 
-  connect();
+  if(util.browser != 'Unsupported')
+  	connect();	
+  else
+  	alert('Use chrome or firefox');
   
 
   function connect (argument) {
@@ -108,23 +114,27 @@
   var count = 10;
   peer.on('error', function(err){
   		setTimeout(function(){
-        						connectionStatus.textContent = err.message;
-        					 },2000);	
-  		alert(err.message);
+        						connectionStatus.text(err.message);
+        					 },5000);	
+  		if( peer.destroyed)
+        	{
+        		connectionStatus.text('Peer Destroyed,Begin Again');
+        		count=12;
+        	}
+  		//alert(err.message);
         count--;
-        if(count>0)
+        if(count>0 && count!=12)
         {
         	alert('RETrYING');
-        	peer.disconnect();
-          	try{
+        	if(peer.disconnected)
+        		peer.reconnect();
+        	else{
+          		peer.disconnect();
           		peer.reconnect();
           		}
-          	catch(e){
-          		peer.disconnect();
-          	}	
         }
-        else
-          connectionStatus.textContent = err.message+' Max no of retries reached';
+        else if(count!=12)
+          connectionStatus.text(err.message+' Max no of retries reached');
         // Return to step 2 if error occurs
         
       });
