@@ -64,15 +64,6 @@ def auth(request):
  	else:
  		return HttpResponse("fail")
  	
-    #url = 'https://www.googleapis.com/oauth2/v3/tokeninfo?id_token='+token+'/'
- 	#serialized_data = urllib2.urlopen(url).read()
- 	#data = json.loads(serialized_data)
- 	#r = requests.post('https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=', token=token)
- 	#idinfo = client.verify_id_token(token, userid)
-    	#except AppIdentityError:
-    	#	logger.error("Invalid Clientid")
-    	# Invalid token
-	#userid = idinfo['email']
 	try:
 		validate_email(email)
 	except forms.ValidationError:
@@ -164,6 +155,11 @@ def tokenpass(request):
 	except:
 		print ">>> Friend Not FOUND"
 		return HttpResponse('2')
+	try:
+		g = Onlinelist.objects.get(user = f.email)
+		print "Friend is present in onlinelist"
+	except:
+		print "Friend not in onlinelist"
 	# temp = u.friendslist
 	# print ">>>>>"+temp
 	if temp:
@@ -180,6 +176,9 @@ def tokenpass(request):
 	else:
 		u.friendslist = friendsEmail
 		print ">>>Friend added to db"
+	if(g.get_time_diff()>30):
+		print ">>>friend is offline"
+		return HttpResponse('4')	
 	if(f.chatactive):
 		print ">>>Friend already in another chat"
 		return HttpResponse('3')
@@ -318,7 +317,7 @@ def chatbox(request):
     	else:
     		print ">>>RECEIVER session variable 3 error"	
     	print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token	
-    	return render_to_response('chat.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
+    	return render_to_response('chat.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token, 'myimage':u.imageurl, 'friendimage':f.imageurl, 'friendname':f.firstName+f.lastName})
     	# else:
     	# 	return render_to_response('chat.html',{'receiver':receiver,'friendtoken':'none', 'mytoken':u.token}) 		
     return redirect('index')

@@ -1,212 +1,140 @@
 {% load staticfiles %}
 <!DOCTYPE html>
-<html>
-<head>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>Chat | WINKY</title>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script> -->
+    <!-- <script src="http://cdn.peerjs.com/0.3/peer.js"></script> -->
+    <script type="text/javascript" src="{% static 'js/peer.js' %}"></script>
+    
+    
+        <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">    
 
-	<title>Chat | Winky</title>
-	<!-- <script type="text/javascript" src="{% static "js/peer.js" %}"></script> -->
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
-
-	<style>
-
-	html,body
-	{
-		margin:0;
-		padding: 0;
-		font-family: Roboto,sans-serif;
-	}
-
-	body
-	{
-		width: 100%;
-		min-height: 100vh;
-		padding-bottom: 32px;
-		box-sizing: border-box;
-		display: flex;
-		justify-content: center;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.toolbar
-	{
-		width: 100%;
-		background: lightgreen;
-		height: 64px;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-
-	.connect
-	{
-		position: relative;
-		width: 25%;
-		height: 30px;
-		margin-top: 32px;
-	}
-
-	.connectionResponse
-	{
-		margin-top: 32px;
-		font-size: 20px;
-	}
-
-	.chatBox
-	{
-		width: 50%;
-		background: lightblue;
-		flex-grow: 1;
-		position: relative;
-	}
-
-	.msgFrm
-	{
-		width: 50%;
-		background: lightyellow;
-		padding: 16px;
-		border-radius: 12px;
-		margin-left: 16px;
-	}
-
-	.msgTo
-	{
-		width: 50%;
-		background: lightgreen;
-		padding: 16px;
-		border-radius: 12px;
-		margin-left: 16px;
-	}
+    
+    
+  <style type="text/css">
+      .chat-thread .me:before {
+        right: -80px;
+        background-image: url('{{  myimage }}');
+      }
+      .chat-thread .him:before {
+        left: -80px;
+        background-image: url('{{ friendimage }}');
+      }
 
 
-	.msgBox
-	{
-		position: absolute;
-		bottom: 0;
-		width: 100%;
-	}
-	</style>
-
-
-
-</head>
-
-<body>
-
-<div class="toolbar">Winky</div>
-<p class="myIdtxt">Peer id : <span class="myId">{{mytoken}}</span></p>
-<p class="connectionStatus">Connecting ...</p>
-
-<div class="chatBox">
-	<p class="msgTo">helloWorld</p>
-
-	<input class="msgBox">
-</div>
-
-
-
-
-<template class="msgTemplateFrm">
-<p class="msgFrm"></p>
-</template>
-
-<template class="msgTemplateTo">
-<p class="msgTo"></p>
-</template>
-
-
-
-</body>
-
-<script>
-var myId = '{{mytoken}}'
-var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3});
-var connectTextBox = $('.connect');
-var connectionStatus = $('.connectionStatus');
-var templateFrom = $('.msgTemplateFrm');
-var templateTo = $('.msgTemplateTo');
-var chatBox = $('.chatBox');
-var msgBox = $('.msgBox');
-var connectedPeer;
-var receiver = '{{receiver}}'
-var friendID = '{{friendtoken}}'
-var receiver = '{{receiver}}'
-
-// isIdready();
-
- msgBox.onkeydown = function(event) {
-     if (event.keyCode == 13) {
-
-    	connectedPeer.send(msgBox.value);
-		templateTo.content.querySelector('p').textContent = msgBox.value;
-		var clone = document.importNode(templateTo.content, true);
-		chatBox.appendChild(clone);
-
-    	msgBox.value = "";
-
-
-     }
- }
-
-
-
-// connectTextBox.onkeydown = function(event) {
-//     if (event.keyCode == 13) {
-        // connect();
-//     }
-// }
-if(receiver==0){
+  </style>        
+  <body>
+  <div class="container">
+  <div class="center">
+    <span class="status">text</span>
+  </div>
+  </div>
+  <ul class="chat-thread">
 	
-	console.log("Client is chat activator")
-}
-else{
-	console.log("Client is chat receiver")
-}
+  </ul>
 
-connect();
+<form class="chat-window" onsubmit="return false;">
+	
+  <input class="chat-window-message" type="text" autocomplete="off" autofocus >
+</form>
+ <script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script type="text/javascript">
+  var myId = '{{mytoken}}'
+  var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3});
+  // var connectTextBox = $('.connect');
+  var connectionStatus = $('.status');
+  // var templateFrom = $('.msgTemplateFrm');
+  // var templateTo = $('.msgTemplateTo');
+   var chatBox = $('.chat-thread');
+  var msgBox = $('.chat-window-message');
+  var connectedPeer;
+  var receiver = '{{receiver}}'
+  var friendID = '{{friendtoken}}'
+  var receiver = '{{receiver}}'
 
-function connect (argument) {
-	try{
-	connectedPeer = peer.connect(friendID);
-		}
-	catch(e){
-		alert(e);
-	}	
-	connectedPeer.on('open', function(){
-	  connectionStatus.textContent = "connected";
-	  //alert("Connected");
-	});
-	console.log("Friend=" + friendID);
-	console.log("Myid =" + myId);
-}
-
-
-peer.on('connection', function(conn) {
-  conn.on('data', function(data){
-
-	console.log(data);
-	templateFrom.content.querySelector('p').textContent = data;
-	var clone = document.importNode(templateFrom.content, true);
-	chatBox.appendChild(clone);
-
-
-
+  $('.chat-window').submit(function () {
+ 	//sendContactForm();
+ 	connectedPeer.send(msgBox.val());
+    var clone = '<li class="me">' + msgBox.val() + "</li>";
+    chatBox.append(clone);
+    msgBox.val(" ");
+ 	return false;
   });
-});
+  connectionStatus.text('help');
 
-function $ (argument) {
-	return document.querySelector(argument);
-}
-peer.on('error', function(err){
-      alert(err.message);
-      connectionStatus.textContent = "Error";
-      // Return to step 2 if error occurs
-      
+  if(receiver==0){    
+    console.log("Client is chat activator")
+  }
+  else{
+    console.log("Client is chat receiver")
+  }
+
+  connect();
+  
+
+  function connect (argument) {
+  	try{
+    connectedPeer = peer.connect(friendID);
+      }
+    catch(e){
+     connectionStatus.text('e');
+    } 
+    connectedPeer.on('open', function(){
+      connectionStatus.text('Connected to '+'{{ friendname }}');
+      //alert("Connected");
     });
+    console.log("Friend=" + friendID);
+    console.log("Myid =" + myId);
+  }
 
+
+  peer.on('connection', function(conn) {
+    conn.on('data', function(data){
+
+    console.log(data);
+    // templateFrom.content.querySelector('p').textContent = data;
+    // var clone = document.importNode(templateFrom.content, true);
+    var clone = '<li class="him">' + data + "</li>";
+    chatBox.append(clone);
+
+
+
+    });
+  });
+
+  var count = 10;
+  peer.on('error', function(err){
+  		setTimeout(function(){
+        						connectionStatus.textContent = err.message;
+        					 },2000);	
+  		alert(err.message);
+        count--;
+        if(count>0)
+        {
+        	alert('RETrYING');
+        	peer.disconnect();
+          	try{
+          		peer.reconnect();
+          		}
+          	catch(e){
+          		peer.disconnect();
+          	}	
+        }
+        else
+          connectionStatus.textContent = err.message+' Max no of retries reached';
+        // Return to step 2 if error occurs
+        
+      });
 
 
 
 </script>
+   
 
+        <!-- <script src="js/index.js"></script> -->
+    
+  </body>
 </html>

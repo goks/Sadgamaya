@@ -261,7 +261,7 @@
             <div id="callFriendEmail">
           </div>
           <div class="modal-body">
-           <div class="row">
+           <div class="row" id="modalContent">
                <div class="col-xs-4">
                    <button class="center-block btn btn-info" onclick="submit( $('#callFriendEmail').html() )"><i class="fa fa-weixin fa-5x"></i></button>
                </div>
@@ -286,6 +286,34 @@
        
         <script type="text/javascript">
             var myemail = '{{myemail}}';
+            function cheatcode(data,type){
+              var namsu;
+              switch(data){
+                            case '1': if(type=="text")
+                                        window.location.replace("/chatbox");
+                                      else if(type=="video")
+                                        window.location.replace("/vidbox");
+                                    break;
+                            case '0': //alert("ERROR");
+                                      namsu = "<h3>ERROR OCCURED</h3><h5>Try again later!</h5>";
+                                    break;        
+                            case '2': //alert("Friend not a winky user");
+                                      namsu = "<h3>Friend not a Winky user</h3><h5>Check the data.</h5>";
+                                    break;
+                            case '3': //alert("Friend already in another chat, pls wait!");
+                                      namsu = "<h3>Friend in another chat</h3><h5>Pls wait</h5>";
+                                    break;
+                            case '4': //alert("Friend is offine");
+                                      namsu = "<h3>Friend is offline</h3><h5>Later!!! :)</h5>";
+                                    break;        
+                            default: console.log("Not from winky server!!!");
+                                      console.log(data)                        
+                          }
+                          //alert(namsu);
+                          $('#modalContent').html(namsu);
+                          $('#myModalLabel').html( '' );
+            }
+
             function submit(Email){
                         // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
                         // peer.on('open', function(id) {
@@ -297,20 +325,10 @@
                             return;
                           }
                           //alert (Email);
+                          //var namsu;
                         $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'chat' },function(data){
-                          switch(data){
-                            case '0': alert("ERROR");
-                                    break;
-                            case '1': window.location.replace("/chatbox");
-                                    break;
-                            case '2': alert("Friend not a winky user");
-                                    break;
-                            case '3': alert("Friend already in another chat, pls wait!");
-                                    break;
-                            default: console.log("Not from winky server!!!");
-                                      console.log(data)                        
-                          }
-                        } );
+                          cheatcode(data,'text');
+                        } );  
                        // });
                        
     }            
@@ -325,19 +343,8 @@
                             return;
                          }
                         $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'video' },function(data){
-                          switch(data){
-                            case '0': alert("ERROR");
-                                    break;
-                            case '1': window.location.replace("/vidbox");
-                                    break;
-                            case '2': alert("Friend not a winky user");
-                                    break;
-                            case '3': alert("Friend already in another chat, pls wait!");
-                                    break;
-                            default: console.log("Not from winky server!!!");
-                                      console.log(data)                        
-                          }
-                        } );
+                          cheatcode(data,'video');
+                        });
                        // });
                        
     }
@@ -397,11 +404,19 @@
 
      </script>
     <script type="text/javascript">
+        var temp  = $('#modalContent').html();
         $('.chatPerson  ').click(function(){
             $('#callFriendEmail').html( $(this).find('.friendEmail').text() );
             $('#callFriend').html( $(this).find('.name  ').text() );
             $('#myModal').modal();
         });
+        $(document).ready(function(){
+          $('#myModal').on('hidden.bs.modal', function () {
+            //alert(temp);
+            $('#modalContent').html(temp);
+          });
+        });
+        
     </script>   
      
     <script type="text/javascript">

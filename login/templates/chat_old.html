@@ -1,0 +1,212 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>Chat | Winky</title>
+	<!-- <script type="text/javascript" src="{% static "js/peer.js" %}"></script> -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
+
+	<style>
+
+	html,body
+	{
+		margin:0;
+		padding: 0;
+		font-family: Roboto,sans-serif;
+	}
+
+	body
+	{
+		width: 100%;
+		min-height: 100vh;
+		padding-bottom: 32px;
+		box-sizing: border-box;
+		display: flex;
+		justify-content: center;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.toolbar
+	{
+		width: 100%;
+		background: lightgreen;
+		height: 64px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.connect
+	{
+		position: relative;
+		width: 25%;
+		height: 30px;
+		margin-top: 32px;
+	}
+
+	.connectionResponse
+	{
+		margin-top: 32px;
+		font-size: 20px;
+	}
+
+	.chatBox
+	{
+		width: 50%;
+		background: lightblue;
+		flex-grow: 1;
+		position: relative;
+	}
+
+	.msgFrm
+	{
+		width: 50%;
+		background: lightyellow;
+		padding: 16px;
+		border-radius: 12px;
+		margin-left: 16px;
+	}
+
+	.msgTo
+	{
+		width: 50%;
+		background: lightgreen;
+		padding: 16px;
+		border-radius: 12px;
+		margin-left: 16px;
+	}
+
+
+	.msgBox
+	{
+		position: absolute;
+		bottom: 0;
+		width: 100%;
+	}
+	</style>
+
+
+
+</head>
+
+<body>
+
+<div class="toolbar">Winky</div>
+<p class="myIdtxt">Peer id : <span class="myId">{{mytoken}}</span></p>
+<p class="connectionStatus">Connecting ...</p>
+
+<div class="chatBox">
+	<p class="msgTo">helloWorld</p>
+
+	<input class="msgBox">
+</div>
+
+
+
+
+<template class="msgTemplateFrm">
+<p class="msgFrm"></p>
+</template>
+
+<template class="msgTemplateTo">
+<p class="msgTo"></p>
+</template>
+
+
+
+</body>
+
+<script>
+var myId = '{{mytoken}}'
+var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3});
+var connectTextBox = $('.connect');
+var connectionStatus = $('.connectionStatus');
+var templateFrom = $('.msgTemplateFrm');
+var templateTo = $('.msgTemplateTo');
+var chatBox = $('.chatBox');
+var msgBox = $('.msgBox');
+var connectedPeer;
+var receiver = '{{receiver}}'
+var friendID = '{{friendtoken}}'
+var receiver = '{{receiver}}'
+
+// isIdready();
+
+ msgBox.onkeydown = function(event) {
+     if (event.keyCode == 13) {
+
+    	connectedPeer.send(msgBox.value);
+		templateTo.content.querySelector('p').textContent = msgBox.value;
+		var clone = document.importNode(templateTo.content, true);
+		chatBox.appendChild(clone);
+
+    	msgBox.value = "";
+
+
+     }
+ }
+
+
+
+// connectTextBox.onkeydown = function(event) {
+//     if (event.keyCode == 13) {
+        // connect();
+//     }
+// }
+if(receiver==0){
+	
+	console.log("Client is chat activator")
+}
+else{
+	console.log("Client is chat receiver")
+}
+
+connect();
+
+function connect (argument) {
+	try{
+	connectedPeer = peer.connect(friendID);
+		}
+	catch(e){
+		alert(e);
+	}	
+	connectedPeer.on('open', function(){
+	  connectionStatus.textContent = "connected";
+	  //alert("Connected");
+	});
+	console.log("Friend=" + friendID);
+	console.log("Myid =" + myId);
+}
+
+
+peer.on('connection', function(conn) {
+  conn.on('data', function(data){
+
+	console.log(data);
+	templateFrom.content.querySelector('p').textContent = data;
+	var clone = document.importNode(templateFrom.content, true);
+	chatBox.appendChild(clone);
+
+
+
+  });
+});
+
+function $ (argument) {
+	return document.querySelector(argument);
+}
+peer.on('error', function(err){
+      alert(err.message);
+      connectionStatus.textContent = "Error";
+      // Return to step 2 if error occurs
+      
+    });
+
+
+
+
+</script>
+
+</html>
