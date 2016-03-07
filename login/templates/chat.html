@@ -118,8 +118,19 @@
         					 },5000);	
   		if( peer.destroyed)
         	{
-        		connectionStatus.text('Peer Destroyed,Begin Again');
+
+        		
         		count=12;
+        		setTimeout(function(){
+        						connectionStatus.text('Peer Destroyed,Begin Again');
+        					 },5000);
+        		try{
+        			peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3});
+        		}
+        		catch(e){
+        			connectionStatus.text('Cannot create new peer,Begin again');
+        		}
+
         	}
   		//alert(err.message);
         count--;
