@@ -9,13 +9,16 @@
          <meta name="google-signin-client_id" content="841750429424-1hba7bekjmrm1ngbn3m2hrlfb44fodgu.apps.googleusercontent.com">
         <title>Dash | Winky</title>
     
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-<!--        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">-->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.3/normalize.min.css">
-        <link rel="stylesheet prefetch" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
-        <script type="text/javascript" src="{% static "js/peercode.js" %}">
-        </script>
+        <!-- <link rel="stylesheet" href="{% static "css/bootstrap.min.css"%}"> -->
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"> -->
+
+        <link rel="stylesheet" href="{% static "css/normalize.min.css"%}">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
+        <!-- <link rel="stylesheet prefetch" href="{% static "css/font-awesome.min.css"%}"> -->
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script> -->
+        <!-- <script type="text/javascript" src="{% static "js/peercode.js" %}"> 
+        </script>-->
         <style>
             @import url(https://fonts.googleapis.com/css?family=Lato:400,700);
             *, *:before, *:after {
@@ -123,6 +126,7 @@
             }
             #signoutmenu{
               opacity: 0.6;
+              right:inherit;
             }
             #searchresult>li{
               cursor: pointer;
@@ -244,8 +248,14 @@
 
                     </div>
                     <div role="tabpanel" class="tab-pane" id="fileChat">
-                        <br>
-                        <h3>Coming Soon!!!</h3>
+                        <div class="form-group">
+                          <br>
+                        <label for="emailforfile">Email address</label>
+                        <input type="email" class="form-control" id="emailforfile" placeholder="Email">
+                          <br>
+                        <button class="btn btn-default" onclick="fileSubmit()">Start Sharing!</button>
+                          <hr>
+                      </div>
                     </div>
                   </div>
             </div>      
@@ -269,7 +279,7 @@
                    <button class="center-block btn btn-info" onclick="vidSubmit( $('#callFriendEmail').html() )"><i class="fa fa-video-camera fa-5x"></i></button>
                </div>
                <div class="col-xs-4">
-                   <button class="center-block btn btn-info"><i class="fa fa-file fa-5x"></i></button>
+                   <button class="center-block btn btn-info" onclick="fileSubmit( $('#callFriendEmail').html() )"><i class="fa fa-file fa-5x"></i></button>
                </div>
            </div>
           </div>
@@ -281,8 +291,8 @@
     </div>
         
         
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="{% static "js/jquery.min.js" %}"></script>
+        <script src="{% static "js/bootstrap.min.js" %}"></script>
        
         <script type="text/javascript">
             var myemail = '{{myemail}}';
@@ -293,6 +303,8 @@
                                         window.location.replace("/chatbox");
                                       else if(type=="video")
                                         window.location.replace("/vidbox");
+                                      else if(type=="file")
+                                        window.location.replace("/file");
                                     break;
                             case '0': //alert("ERROR");
                                       namsu = "<h3>ERROR OCCURED</h3><h5>Try again later!</h5>";
@@ -312,6 +324,7 @@
                           //alert(namsu);
                           $('#modalContent').html(namsu);
                           $('#myModalLabel').html( '' );
+                          $('#myModal').modal();
             }
 
             function submit(Email){
@@ -348,6 +361,22 @@
                        // });
                        
     }
+    function fileSubmit(Email){
+                        // var peer = new Peer({key: 'pa3g9qguzmgc766r'});
+                        // peer.on('open', function(id) {
+                        //   console.log('My peer ID is: ' + id);
+                         if(Email==null)
+                            Email = document.getElementById("emailforfile").value;
+                         if(Email==myemail){
+                            alert("You serious???"); 
+                            return;
+                         }
+                        $.post('/tokenpass/', {'friendsEmail=':Email, 'type=':'file' },function(data){
+                          cheatcode(data,'file');
+                        });
+                       // });
+                       
+    }
     </script> 
     <script type="text/javascript">                   
       // You can pick your own id or omit the id if you want to get a random one from the server. 
@@ -370,6 +399,8 @@
                                                           window.location.href = "/chatbox";
                                             else if(data==2)
                                                           window.location.href = "/vidbox";
+                                            else if(data==3)
+                                                          window.location.href = "/file";            
                                             else 
                                                           alert (data);
                                             
@@ -424,7 +455,7 @@
              var auth2 = gapi.auth2.getAuthInstance();
              auth2.signOut().then(function () {
                console.log('User signed out.');
-               location.reload();
+               window.location.href = '/';
              });
           }
           function onLoad() {

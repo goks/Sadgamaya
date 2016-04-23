@@ -1,0 +1,300 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html >
+  <head>
+    <meta charset="UTF-8">
+    <title>FileChat | WINKY</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/0.3.14/peer.js"></script>
+    <!-- <script src="http://cdn.peerjs.com/0.3/peer.js"></script> -->
+    <!-- <script type="text/javascript" src="{% static 'js/peer.js' %}"></script> -->
+    
+    
+        <!-- <link rel="stylesheet" href="css/style.css"> -->
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">    
+
+    
+    
+  <style type="text/css">
+      .chat-thread .me:before {
+        right: -80px;
+        background-image: url('{{  myimage }}');
+      }
+      .chat-thread .him:before {
+        left: -80px;
+        background-image: url('{{ friendimage }}');
+      }
+      #fileSensor {
+      	height: 100%;
+      	width: 100%;
+      }
+      #upload-file-container {
+        /*background-color: #fff;*/
+        display: none;
+      }
+
+      #upload-file-container input {
+        /*filter: alpha(opacity=0.2);*/
+        /*opacity: 0;*/
+      }
+
+  </style>        
+
+  <body>
+  <div class="container">
+  <div class="center">
+    <span class="status">Connecting . . .</span>
+  </div>
+  </div>
+  <div id="fileSensor">
+  	<ul class="chat-thread">
+	   <li>haii</li>
+ 	</ul>
+    <button id="falseBut">Click here to send a file...</button>
+  	<form class="chat-window" onsubmit="return false;">
+
+    <div id="upload-file-container">
+      <input id="originalBut" type="file" name="photo" />
+    </div>
+    
+		<input class="chat-window-message" type="text" autocomplete="off" autofocus >
+	</form>
+  <!-- <form action="upload.php" method="post" enctype="multipart/form-data"> -->
+    
+    <!-- <input type="submit" value="Upload Image" name="submit"> -->
+<!-- </form> -->
+   </div>
+
+
+<script src='http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script type="text/javascript">
+  var myId = '{{mytoken}}'
+  var peer = new Peer(myId,{
+      key: 'pa3g9qguzmgc766r',
+      //debug: 3,
+      //host: '192.168.2.51', port: 9001, path: '/'
+    });
+  // var connectTextBox = $('.connect');
+  var connectionStatus = $('.status');
+   var chatBox = $('.chat-thread');
+  var msgBox = $('.chat-window-message');
+  var connectedPeer;
+  var receiver = '{{receiver}}'
+  var friendID = '{{friendtoken}}'
+  var receiver = '{{receiver}}'
+  var box = $('#fileSensor');
+  var friendname = '{{friendname}}';
+  var file=0;
+
+  $(document).ready(function(){
+
+      $('#falseBut').click(function(){
+        $('#originalBut').click();
+      });
+
+    
+     $('input[type=file]').change(function () {
+         var filePath=$('#originalBut').val();
+         //alert(filePath);
+         msgBox.val("SEND FILE? - "+filePath); 
+         file=1;
+
+     });
+
+     
+      // box.on('dragenter', doNothing);
+      // box.on('dragover', doNothing);
+      // box.on('drop', function(e){
+      //   alert("Kitit");
+       // e.originalEvent.preventDefault();
+       // var file = e.originalEvent.dataTransfer.files[0];
+       // eachActiveConnection(function(c, $c) {
+          // if (connectedPeer.label === 'file') {
+          //   connectedPeer.send(file);
+          //   alert("Kitit2");
+          //   var clone = '<p>' + "You sent a file" + "</p>";
+          //   chatBox.append(clone);
+          //   //$c.find('.messages').append('<div><span class="file">You sent a file.</span></div>');
+           // } 
+        //});
+     // });
+      // function doNothing(e){
+      //   e.preventDefault();
+      //   e.stopPropagation();
+      // }
+
+  });
+  $('.chat-window').submit(function () {
+        	//sendContactForm();
+          //alert("Hello");
+          var himalayan = msgBox.val()
+          if(file==1 && himalayan[0]=="S"){
+            alert("file mode ON");
+            var fileContent = $('#originalBut').prop('files');
+            connectedPeer.send(file);
+            //alert("File sent");
+            var clone = '<p>' + "You sent a file" + "</p>";
+                    chatBox.append(clone);
+            msgBox.val("");        
+            file=0;
+          }
+          else if (file==1) {
+            file=0;
+            alert("File mode turned off");
+          }
+ 	        else if(himalayan!=''){
+ 		       //alert(msgBox.val());
+	 	       connectedPeer.send(msgBox.val());
+	           var clone = '<li class="me">' + msgBox.val() + "</li>";
+	           chatBox.append(clone);
+	           msgBox.val("");
+	       }    
+ 	        return false;
+  });
+  //connectionStatus.text('help');
+
+  if(receiver==0){    
+    console.log("Client is chat activator")
+  }
+  else{
+    console.log("Client is chat receiver")
+  }
+
+  if(util.browser != 'Unsupported')
+  	connect();	
+  else
+  	alert('Use chrome or firefox');
+  
+
+  function connect (argument) {
+  	try{
+    connectedPeer = peer.connect(friendID, {
+        //label: 'chat',
+        //serialization: 'none',
+       // metadata: {message: 'hi i want to chat with you!'}
+      });
+     // alert("attempt 1");
+      }
+    catch(e){
+     connectionStatus.text('e');
+    } 
+    connectedPeer.on('open', function(){
+      connectionStatus.text('Connected to '+'{{ friendname }}');
+      //alert("Connected");
+      //connect2();
+    });
+    console.log("Friend=" + friendID);
+    console.log("Myid =" + myId);
+  }
+
+  function connect2(){
+
+  	if (connectedPeer.label === 'chat') {
+    // var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
+    // var header = $('<h1></h1>').html('Chat with <strong>' + c.peer + '</strong>');
+    // var messages = $('<div><em>Peer connected.</em></div>').addClass('messages');
+    // chatbox.append(header);
+    // chatbox.append(messages);
+ 
+    // Select connection handler.
+    // chatbox.on('click', function() {
+    //   if ($(this).attr('class').indexOf('active') === -1) {
+    //     $(this).addClass('active');
+    //   } else {
+    //     $(this).removeClass('active');
+    //   }
+    // });
+    // $('.filler').hide();
+    // $('#connections').append(chatbox);
+
+   // c.on('data', function(data) {
+      // messages.append('<div><span class="peer">' + c.peer + '</span>: ' + data +
+      //   '</div>');
+     //   });
+       // c.on('close', function() {
+         // alert(c.peer + ' has left the chat.');
+          //chatbox.remove();
+          // if ($('.connection').length === 0) {
+          //   $('.filler').show();
+          //}
+          //delete connectedPeers[connectedPeer.peer];
+        //});
+  } else if (connectedPeer.label === 'file') {
+    connectedPeer.on('data', function(data) {
+      // If we're getting a file, create a URL for it.
+      if (data.constructor === ArrayBuffer) {
+         var dataView = new Uint8Array(data);
+         var dataBlob = new Blob([dataView]);
+         var url = window.URL.createObjectURL(dataBlob);
+         var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
+         chatBox.append(clone);
+       
+      }
+    });
+  }
+  
+
+  }
+
+
+  peer.on('connection', function(conn) {
+    conn.on('data', function(data){
+
+    console.log(data);
+    // templateFrom.content.querySelector('p').textContent = data;
+    // var clone = document.importNode(templateFrom.content, true);
+    var clone = '<li class="him">' + data + "</li>";
+    chatBox.append(clone);
+
+
+
+    });
+  });
+
+  var count = 10;
+  peer.on('error', function(err){
+  		 setTimeout(function(){
+         						connectionStatus.text(err.message);
+         					 },5000);	
+  		// if( peer.destroyed)
+    //     	{
+
+        		
+    //     		count=12;
+    //     		setTimeout(function(){
+    //     						connectionStatus.text('Peer Destroyed,Begin Again');
+    //     					 },5000);
+    //     		try{
+    //     			peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 3, host: '192.168.2.51', port: 9000, path: '/'});
+    //     		}
+    //     		catch(e){
+    //     			connectionStatus.text('Cannot create new peer,Begin again');
+    //     		}
+
+    //     	}
+  		// //alert(err.message);
+    //     count--;
+    //     if(count>0 && count!=12)
+    //     {
+    //     	console.log('RETrYING');
+    //     	if(peer.disconnected)
+    //     		peer.reconnect();
+    //     	else{
+    //       		peer.disconnect();
+    //       		peer.reconnect();
+    //       		}
+    //     }
+    //     else if(count!=12)
+    //       connectionStatus.text(err.message+' Max no of retries reached');
+    //     // Return to step 2 if error occurs
+        
+       });
+
+
+
+</script>
+   
+
+        <!-- <script src="js/index.js"></script> -->
+    
+  </body>
+</html>

@@ -11,4 +11,5 @@ urlpatterns = [
     url(r'^chatcheck/',views.chatcheck, name='chatcheck'),
     url(r'^vidbox/',views.vidbox, name='vidbox'),
     url(r'^search/',views.search, name='search'),
+    url(r'^file/',views.file, name='file'),
 ]

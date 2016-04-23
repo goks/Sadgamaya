@@ -26,6 +26,7 @@ def index(request):
 	request.session['dashboard'] =	0
 	request.session['chatbox'] = 0
 	request.session['receiver'] = 0
+	request.session['file'] = 0
 	#request.session.set_test_cookie()
 	#request.session['login'] = 0
 	return HttpResponse(template.render(context))
@@ -93,8 +94,8 @@ def dash(request):
 	#if (request.session.test_cookie_worked()):
 	#	print ">>>> TEST COOKIE WORKED!"
     #	request.session.delete_test_cookie()
-    if ('dashboard' in request.session and request.session['dashboard']==1):
-    	request.session['dashboard']=0
+    if ('email' in request.session and request.session['dashboard']==1):
+    	# request.session['dashboard']=0
     	request.session['chatbox']=0
     	template=loader.get_template('dash.html')
     	context=RequestContext(request)
@@ -253,8 +254,10 @@ def chatcheck(request):
    			if(u.chattype == "chat"):
    					response = 1
    			elif(u.chattype == "video"):
-   					response = 2   			
-   	else :
+   					response = 2
+   			elif(u.chattype == "file"):
+					response = 3
+	else :
    			print ">>"+u.firstName+"RECEIVER WAITING FOR CHAT"
    			response = 0   			
    	def obj_dict(obj):
@@ -276,7 +279,7 @@ def chatbox(request):
     email = request.session['email']
     if ('chatbox' in request.session and request.session['chatbox']==1):
     	request.session['chatbox']=0
-    	request.session['dashboard'] = 0
+    	# request.session['dashboard'] = 0
     	template=loader.get_template('chat.html')
     	context=RequestContext(request)
     	u = User.objects.get(email = email)
@@ -328,7 +331,7 @@ def vidbox(request):
 	email = request.session['email']
 	if ('chatbox' in request.session and request.session['chatbox']==1):
 		request.session['chatbox']=0
-		request.session['dashboard'] = 0
+		#request.session['dashboard'] = 0
 		template=loader.get_template('vid.html')
 		context=RequestContext(request)
 		u = User.objects.get(email = email)
@@ -387,3 +390,58 @@ def search(request):
 	except KeyError:
 		return HttpResponse('Error')
 	return HttpResponse('{}',content_type='application/json')
+
+@csrf_exempt
+@never_cache
+def file(request):
+	#if (request.session.test_cookie_worked()):
+	#	print ">>>> TEST COOKIE WORKED!"
+    #	request.session.delete_test_cookie()
+    email = request.session['email']
+    if ('chatbox' in request.session and request.session['chatbox']==1):
+    	request.session['chatbox']=0
+    	# request.session['dashboard'] = 0
+    	template=loader.get_template('file.html')
+    	context=RequestContext(request)
+    	u = User.objects.get(email = email)
+    	temp = u.friendslist
+    	receiver = request.session['receiver']
+    	print "receiver is" + str(receiver)
+    	if receiver==1:
+    		request.session['receiver'] = 3
+    		try:
+    			f = User.objects.get(token = u.tempfriendtoken)
+    			friendsemail = f.email
+    			print ">>>Receivers friend is " + f.firstName
+    		except:
+    			print ">>> Friend Not FOUND"
+    		if temp:
+    			# print ">>>>>"+temp
+    			tempstring = temp.split()
+    			for word in tempstring:
+    				# print ">>>>>>" + word
+    				if(word==friendsemail):
+    					print ">>>>>>>Friend already in Database"
+    					break
+    			else:
+    				print ">>>>>>>>Friendslist not empty;Friend first time"
+    				u.friendslist = temp + ' ' + friendsemail
+    		else:
+    			u.friendslist = friendsemail
+    			print ">>>Friend added to db"
+    		u.save()	
+    	elif receiver==0:
+    		request.session['receiver'] = 3
+    		try:	
+    			f = User.objects.get(token = u.tempfriendtoken)
+    		except:
+    			print ">>>Failed obtaining activators friend's token"	
+    		print ">>>Caller: " + u.firstName + "receiver is: " + f.firstName
+    		# userid = u.firstName+" "+u.lastName
+    	else:
+    		print ">>>RECEIVER session variable 3 error"	
+    	print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token	
+    	return render_to_response('file.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token, 'myimage':u.imageurl, 'friendimage':f.imageurl, 'friendname':f.firstName+f.lastName})
+    	# else:
+    	# 	return render_to_response('chat.html',{'receiver':receiver,'friendtoken':'none', 'mytoken':u.token}) 		
+    return redirect('index')	

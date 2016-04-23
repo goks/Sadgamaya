@@ -89,7 +89,7 @@
 // var video = document.querySelector('');
 
 // function successCallback(stream) {
-//   window.stream = stream; // stream available to console
+//   window.stream =stream; // stream available to console
 //   if (window.URL) {
 //     video.src = window.URL.createObjectURL(stream);
 //   } else {
@@ -109,7 +109,12 @@
 <script type="text/javascript">
 
 		var myId = '{{mytoken}}';
-		var peer = new Peer(myId,{key: 'pa3g9qguzmgc766r', debug: 4});
+		var peer = new Peer(myId,{
+			key: 'pa3g9qguzmgc766r', 
+			debug: 3,
+			//host: '192.168.2.51', port: 9001, path: '/'
+			});
+
 		var connectionStatus = $('#connectionStatus');
 		var receiver = '{{receiver}}';
 		var friendID = '{{friendtoken}}';
