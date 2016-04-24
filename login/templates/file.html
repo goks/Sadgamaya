@@ -47,8 +47,8 @@
   </div>
   <div id="fileSensor">
   	<ul class="chat-thread">
-	   <li>haii</li>
- 	</ul>
+
+	  </ul>
     <button id="falseBut">Click here to send a file...</button>
   	<form class="chat-window" onsubmit="return false;">
 
@@ -84,23 +84,35 @@
   var box = $('#fileSensor');
   var friendname = '{{friendname}}';
   var file=0;
+  var evt;
 
   $(document).ready(function(){
 
-      $('#falseBut').click(function(){
+      $('#falseBut').click(function(){   //button replace
         $('#originalBut').click();
       });
 
     
-     $('input[type=file]').change(function () {
+     $('input[type=file]').change(function (lip) {  //file input function
          var filePath=$('#originalBut').val();
          //alert(filePath);
          msgBox.val("SEND FILE? - "+filePath); 
          file=1;
+         evt = lip
 
      });
 
-     
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      console.log("FILE API SUPPORT _ OK");
+    } else {
+      var lulu = "The File APIs are not fully supported by your browser.Quitting. . .";
+      alert(lulu);
+      msgbox.val(lulu);
+    }
+
+
+
+
       // box.on('dragenter', doNothing);
       // box.on('dragover', doNothing);
       // box.on('drop', function(e){
@@ -128,13 +140,14 @@
           //alert("Hello");
           var himalayan = msgBox.val()
           if(file==1 && himalayan[0]=="S"){
-            alert("file mode ON");
+            //alert("file mode ON");
             var fileContent = $('#originalBut').prop('files');
             connectedPeer.send(file);
             //alert("File sent");
             var clone = '<p>' + "You sent a file" + "</p>";
                     chatBox.append(clone);
-            msgBox.val("");        
+            msgBox.val("");  
+            readSingleFile();      
             file=0;
           }
           else if (file==1) {
@@ -150,6 +163,58 @@
 	       }    
  	        return false;
   });
+
+
+  function readSingleFile() {
+    //Retrieve the first (and only!) File from the FileList object
+    var file = evt.target.files[0]; 
+
+    if (file) {
+     //  var r = new FileReader();
+     //  r.onload = function(e) { 
+     //    var contents = e.target.result;
+     //    // alert( "Got the file.n" 
+     //    //       +"name: " + f.name + "n"
+     //    //       +"type: " + f.type + "n"
+     //    //       +"size: " + f.size + " bytesn"
+     //    //       + "starts with: " + contents.substr(1, contents.indexOf("n"))
+     //    // );
+     //     var arrayBuffer = r.result;
+     //     connectedPeer2.send(arrayBuffer);  
+     //  }
+     // r.readAsText(f);
+     // // r.readAsArrayBuffer(f);
+
+     var reader = new window.FileReader();
+     reader.readAsDataURL(file);
+     reader.onload = onReadAsDataURL;
+     var chunkLength = 1000;
+     function onReadAsDataURL(event, text) {
+            var data = {}; // data object to transmit over data channel       
+
+            if (event) text = event.target.result; // on first invocation       
+
+            if (text.length > chunkLength) {
+                data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
+            } else {
+                data.message = text;
+                data.last = true;
+            }       
+
+            //dataChannel.send(data); // use JSON.stringify for chrome!       
+            connectedPeer2.send(data);
+
+            var remainingDataURL = text.slice(data.message.length);
+            if (remainingDataURL.length) setTimeout(function () {
+                onReadAsDataURL(null, remainingDataURL); // continue transmitting
+            }, 500)
+        }
+
+
+    } else { 
+      alert("Failed to load file");
+    }
+  }
   //connectionStatus.text('help');
 
   if(receiver==0){    
@@ -168,9 +233,15 @@
   function connect (argument) {
   	try{
     connectedPeer = peer.connect(friendID, {
-        //label: 'chat',
+        label: 'chat',
         //serialization: 'none',
-       // metadata: {message: 'hi i want to chat with you!'}
+        metadata: {message: 'hi i want to chat with you!'}
+      });
+     // alert("attempt 1");
+     connectedPeer2 = peer.connect(friendID, {
+        label: 'file',
+        serialization: 'JSON',
+        metadata: {message: 'hi i want to send files with you!'}
       });
      // alert("attempt 1");
       }
@@ -186,9 +257,9 @@
     console.log("Myid =" + myId);
   }
 
-  function connect2(){
+  // function connect2(){
 
-  	if (connectedPeer.label === 'chat') {
+  	// if (connectedPeer.label === 'chat') {
     // var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
     // var header = $('<h1></h1>').html('Chat with <strong>' + c.peer + '</strong>');
     // var messages = $('<div><em>Peer connected.</em></div>').addClass('messages');
@@ -218,36 +289,50 @@
           //}
           //delete connectedPeers[connectedPeer.peer];
         //});
-  } else if (connectedPeer.label === 'file') {
-    connectedPeer.on('data', function(data) {
-      // If we're getting a file, create a URL for it.
-      if (data.constructor === ArrayBuffer) {
-         var dataView = new Uint8Array(data);
-         var dataBlob = new Blob([dataView]);
-         var url = window.URL.createObjectURL(dataBlob);
-         var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
-         chatBox.append(clone);
-       
-      }
-    });
-  }
+  // } 
   
 
-  }
+  //}
 
 
   peer.on('connection', function(conn) {
-    conn.on('data', function(data){
+    if (conn.label === 'chat') {
+        conn.on('data', function(data){
+        console.log(data);
+        // templateFrom.content.querySelector('p').textContent = data;
+        // var clone = document.importNode(templateFrom.content, true);
+        var clone = '<li class="him">' + data + "</li>";
+        chatBox.append(clone);
+        });
+    }
+    if (conn.label === 'file') {
+      connectedPeer.on('data', function(data) {
+      // If we're getting a file, create a URL for it.
+      // if (data.constructor === ArrayBuffer) {
+      //    var dataView = new Uint8Array(data);
+      //    var dataBlob = new Blob([dataView]);
+      //    var url = window.URL.createObjectURL(dataBlob);
+      //    var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
+      //    chatBox.append(clone);
+       
+      // }
 
-    console.log(data);
-    // templateFrom.content.querySelector('p').textContent = data;
-    // var clone = document.importNode(templateFrom.content, true);
-    var clone = '<li class="him">' + data + "</li>";
-    chatBox.append(clone);
+      var data2 = JSON.parse(event.data);
 
+      arrayToStoreChunks.push(data2.message); // pushing chunks in array
+
+      if (data2.last) {
+          saveToDisk(arrayToStoreChunks.join(''), 'tempFileName');
+          arrayToStoreChunks = []; // resetting array
+          alert("RECEIVING DONE");
+      }
+      var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
+      chatBox.append(clone);
 
 
     });
+  }
+
   });
 
   var count = 10;
