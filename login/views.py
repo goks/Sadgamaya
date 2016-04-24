@@ -439,5 +439,5 @@ def file(request):
     else:
       print ">>>RECEIVER session variable 3 error"
     print ">>"+u.firstName+"token: " + u.token + " receiverstoken: " + f.token
-    return render_to_response('file.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token})
+    return render_to_response('file.html',{'receiver':receiver, 'friendtoken':f.token, 'mytoken':u.token, 'myimage':u.imageurl, 'friendimage':f.imageurl, 'friendname':f.firstName+f.lastName})
   return redirect('index')

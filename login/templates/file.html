@@ -37,6 +37,10 @@
         /*opacity: 0;*/
       }
 
+      .filespecial{
+        color: #fff !important;
+      }
+
   </style>        
 
   <body>
@@ -80,12 +84,15 @@
   var connectedPeer, connectedPeer2;
   var receiver = '{{receiver}}'
   var friendID = '{{friendtoken}}'
-  var receiver = '{{receiver}}'
+ // var receiver = '{{receiver}}'
   var box = $('#fileSensor');
   var friendname = '{{friendname}}';
   var file=0;
+  var filetype = 'plain/text';
+  var filesize = '0';
+  var filename = 'temp.txt'
   var evt;
-
+  var Final_Text="Connecting . . .";
   $(document).ready(function(){
 
       $('#falseBut').click(function(){   //button replace
@@ -97,6 +104,7 @@
          var filePath=$('#originalBut').val();
          //alert(filePath);
          msgBox.val("SEND FILE? - "+filePath); 
+         $(msgBox).focus();
          file=1;
          evt = lip
 
@@ -107,32 +115,10 @@
     } else {
       var lulu = "The File APIs are not fully supported by your browser.Quitting. . .";
       alert(lulu);
-      connectionStatus.val(lulu);
+      connectionStatus.text(lulu);
     }
 
 
-
-
-      // box.on('dragenter', doNothing);
-      // box.on('dragover', doNothing);
-      // box.on('drop', function(e){
-      //   alert("Kitit");
-       // e.originalEvent.preventDefault();
-       // var file = e.originalEvent.dataTransfer.files[0];
-       // eachActiveConnection(function(c, $c) {
-          // if (connectedPeer.label === 'file') {
-          //   connectedPeer.send(file);
-          //   alert("Kitit2");
-          //   var clone = '<p>' + "You sent a file" + "</p>";
-          //   chatBox.append(clone);
-          //   //$c.find('.messages').append('<div><span class="file">You sent a file.</span></div>');
-           // } 
-        //});
-     // });
-      // function doNothing(e){
-      //   e.preventDefault();
-      //   e.stopPropagation();
-      // }
 
   });
   $('.chat-window').submit(function () {
@@ -145,7 +131,7 @@
             //connectedPeer.send(file);
             //alert("File sent");
             readSingleFile();      
-            var clone = '<p>' + "You sent a file" + "</p>";
+            var clone = '<li class="me filespecial">' + "You sent a file" + "</li>";
                     chatBox.append(clone);
             msgBox.val("");  
             
@@ -174,64 +160,16 @@
        var r = new FileReader();
        r.onload = function(e) { 
          var contents = e.target.result;
-     //    // alert( "Got the file.n" 
-     //    //       +"name: " + f.name + "n"
-     //    //       +"type: " + f.type + "n"
-     //    //       +"size: " + f.size + " bytesn"
-     //    //       + "starts with: " + contents.substr(1, contents.indexOf("n"))
-     //    // );
-          var arrayBuffer = r.result;
-     //     connectedPeer2.send(arrayBuffer);  
        }
        //r.readAsText(file);
        r.readAsBinaryString(file);  
-     // // r.readAsArrayBuffer(f);
 
-      // if(util.browser === 'Chrome')
-      // {
-      //     var reader = new window.FileReader();
-      //      reader.readAsDataURL(file);
-      //      reader.onload = onReadAsDataURL;
-      //      var chunkLength = 1000;
-      //      function onReadAsDataURL(event, text) {
-      //             var data = {}; // data object to transmit over data channel             
-
-      //             if (event) text = event.target.result; // on first invocation             
-
-      //             if (text.length > chunkLength) {
-      //                 data.message = text.slice(0, chunkLength); // getting chunk using predefined chunk length
-      //             } else {
-      //                 data.message = text;
-      //                 data.last = true;
-      //             }             
-
-      //             //dataChannel.send(data); // use JSON.stringify for chrome!       
-      //             connectedPeer2.send(data);      
-
-      //             var remainingDataURL = text.slice(data.message.length);
-      //             if (remainingDataURL.length) setTimeout(function () {
-      //                 onReadAsDataURL(null, remainingDataURL); // continue transmitting
-      //             }, 500)
-      //         }
-
-      // }
-
-      //if(util.browser === 'Firefox')
-      //{
+        var tulsi = file.name.split('/');
+        var ila = tulsi[tulsi.length-1];
+        var filedetails = "$!$!--$!$!`"+file.type+"`"+file.size+"`"+ila;
+        connectedPeer.send(filedetails);
         connectedPeer2.send(file);
        
-
-        // dataChannel.onmessage = function (event) {
-        //   var blob = event.data; // Firefox allows us send blobs directly
-
-        //   var reader = new window.FileReader();
-        //   reader.readAsDataURL(blob);
-        //   reader.onload = function (event) {
-        //     var fileDataURL = event.target.result; // it is Data URL...can be saved to disk
-        //     SaveToDisk(fileDataURL, 'fake fileName');
-        //   };
-        // };
-      //}
 
     } else { 
       alert("Failed to load file");
@@ -270,57 +208,34 @@
     catch(e){
      connectionStatus.text('e');
     } 
+    var mode1=0,mode2=0;
     connectedPeer.on('open', function(){
-      connectionStatus.text('Chat OK with'+'{{ friendname }}');
+      Final_Text = "Text mode";
+      connectionStatus.text(Final_Text);
+      mode1++;
+      if(mode1&&mode2){
+        Final_Text = 'Text and File mode';
+        connectionStatus.text(Final_Text);
+      }
       //alert("Connected");
       //connect2();
     });
     connectedPeer2.on('open', function(){
-      connectionStatus.text('Send File OK with '+'{{ friendname }}');
-      //alert("Connected");
-      //connect2();
+      Final_Text = "File mode";
+      connectionStatus.text(Final_Text);
+      mode2++;
+      if(mode1&&mode2)
+        {
+          Final_Text = 'Text and File mode';
+          connectionStatus.text(Final_Text);
+        }
+      
     });
     console.log("Friend=" + friendID);
     console.log("Myid =" + myId);
   }
 
-  // function connect2(){
-
-  	// if (connectedPeer.label === 'chat') {
-    // var chatbox = $('<div></div>').addClass('connection').addClass('active').attr('id', c.peer);
-    // var header = $('<h1></h1>').html('Chat with <strong>' + c.peer + '</strong>');
-    // var messages = $('<div><em>Peer connected.</em></div>').addClass('messages');
-    // chatbox.append(header);
-    // chatbox.append(messages);
- 
-    // Select connection handler.
-    // chatbox.on('click', function() {
-    //   if ($(this).attr('class').indexOf('active') === -1) {
-    //     $(this).addClass('active');
-    //   } else {
-    //     $(this).removeClass('active');
-    //   }
-    // });
-    // $('.filler').hide();
-    // $('#connections').append(chatbox);
-
-   // c.on('data', function(data) {
-      // messages.append('<div><span class="peer">' + c.peer + '</span>: ' + data +
-      //   '</div>');
-     //   });
-       // c.on('close', function() {
-         // alert(c.peer + ' has left the chat.');
-          //chatbox.remove();
-          // if ($('.connection').length === 0) {
-          //   $('.filler').show();
-          //}
-          //delete connectedPeers[connectedPeer.peer];
-        //});
-  // } 
   
-
-  //}
-
 
   peer.on('connection', function(conn) {
     if (conn.label === 'chat') {
@@ -328,34 +243,31 @@
         console.log(data);
         // templateFrom.content.querySelector('p').textContent = data;
         // var clone = document.importNode(templateFrom.content, true);
+        if(data.substring(0,10)=='$!$!--$!$!'){
+          connectionStatus.text('Incoming File connection. . .');
+          var temp = data.split("`");
+          filetype = temp[1];
+          filesize = temp[2];
+          filename = temp[3];
+         // alert(filetype+' '+filesize+' '+filename);
+        }
+        else{
         var clone = '<li class="him">' + data + "</li>";
         chatBox.append(clone);
+        }
         });
     }
     if (conn.label === 'file') {
-      connectionStatus.val('File received');
-      connectedPeer.on('data', function(data) {
-//      If we're getting a file, create a URL for it.
-      if (data.constructor === ArrayBuffer) {
-         var dataView = new Uint8Array(data);
-         var dataBlob = new Blob([dataView]);
-         var url = window.URL.createObjectURL(dataBlob);
-         var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
-         chatBox.append(clone);
-       
-      }
+      
+      conn.on('data', function(data) {
+        
+       var bloB=window.URL.createObjectURL(
+        new Blob([data], {type : filetype})
+      );
 
-      // var data2 = JSON.parse(event.data);
-
-      // arrayToStoreChunks.push(data2.message); // pushing chunks in array
-
-      // if (data2.last) {
-      //     saveToDisk(arrayToStoreChunks.join(''), 'tempFileName');
-      //     arrayToStoreChunks = []; // resetting array
-      //     alert("RECEIVING DONE");
-      // }
-      var clone = "<li class='him'>" + "Sent you a <a target='_blank' href="+ url +">file</a>." + "</li>";
+      var clone = "<li class='him filespecial'>" + "Sent you <a href="+ bloB+" download=" +filename+" target='_blank' >"+filename+"</a>." +"("+Math.round(filesize/1024) +"kB) </li>";
       chatBox.append(clone);
+      connectionStatus.text(Final_Text);
 
 
     });
