@@ -82,30 +82,6 @@
        
      
 </body>	
-<script>
-// var getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-// var constraints = {audio: false, video: true};
-// var video = document.querySelector('');
-
-// function successCallback(stream) {
-//   window.stream =stream; // stream available to console
-//   if (window.URL) {
-//     video.src = window.URL.createObjectURL(stream);
-//   } else {
-//     video.src = stream;
-//   }
-// }
-
-// function errorCallback(error){
-//   console.log("navigator.getUserMedia error: ", error);
-// }
-
-// navigator.getUserMedia(constraints, successCallback, errorCallback);
-// // isIdready();
- 
- 
-</script>
 <script type="text/javascript">
 
 		var myId = '{{mytoken}}';
@@ -118,7 +94,7 @@
 		var connectionStatus = $('#connectionStatus');
 		var receiver = '{{receiver}}';
 		var friendID = '{{friendtoken}}';
-		var receiver = '{{receiver}}';
+		//var receiver = '{{receiver}}';
 		//var window.vidstream ;
 
 		$('#my-id').html(myId);
@@ -195,6 +171,7 @@
 	console.log("VILI VANNU");
 	connectionStatus.html("Connected");
 	console.log("localstream of receiver" + window.vidstream);
+
 	function waitforvidstream(){
 	if(window.getUserMediaStatus==1){
 		if(window.vidstream!=null){

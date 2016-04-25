@@ -21,7 +21,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 #======Index Page======#
 @ensure_csrf_cookie #cross reference 
 def index(request):
-	template=loader.get_template('login.html')
+	template=loader.get_template('login2.html')
 	context=RequestContext(request)
 	request.session['dashboard'] =	0
 	request.session['chatbox'] = 0
