@@ -24,6 +24,7 @@
 		body
 		{
 			font-family: sans-serif;
+			background-color: #ff6e40;	
 		}
 
 		header
@@ -34,12 +35,14 @@
 			text-align: center;
 		}
 		.heading{
-			font-family: "Lato";
+			
 			/*line-height: 56px;*/
 		}
 		h1{
 			margin-bottom: 4px;
 			margin-top: 4px;
+			font-family: "Lato";
+			font-size: -webkit-xxx-large;
 		}
 
 		header .sign
@@ -51,7 +54,7 @@
 
 		img,svg
 		{
-			width: 80%;
+			width: 60%;
 			display: block;
 			margin: auto;
 			margin-bottom: 64px;
@@ -86,12 +89,20 @@
 			/*background-color: #5DD39E;*/
 		}
 		#svg1{
-			margin-top: 90px;
+			margin-top: 140px;
 		}
 		
 		.btn{
 			margin-right: 4px;
 		}
+		#banner{
+			width: 20%;	
+			margin-bottom: 5px;
+			margin-top: 5px;
+		}
+		a{
+			padding: 10px;
+			padding-right: 0px; }
 
 	</style>
 <script src="{% static "js/jquery.min.js" %}"></script>
@@ -131,8 +142,8 @@ function onFailure(error) {
 function renderButton() {
       gapi.signin2.render('signinbut', {
         'scope': 'https://www.googleapis.com/auth/plus.login',
-        //'width': 200,
-        //'height': 50,
+         'width': 140,
+        'height': 36,
         //'longtitle': true,
         //'theme': 'dark',
         'callback': onSuccess,
@@ -151,10 +162,16 @@ function renderButton() {
 
 <body>
 <header>
-	<h1 class="heading">Winky</h1>
+	<!-- <h1 class="heading">Winky</h1> -->
+	<img src="{% static 'images/banner.png' %}" class="center-block" id="banner">
 	<!-- <span class="sign">Sign in</span> -->
  <!-- <div class="btn-bg bg-1"> -->
-   <a href="#!" class="btn btn-5 " id="signinbut" data-onsuccess="onSignIn"  >Signup/Login</a> 
+   <a href="#!" class="btn btn-5 "  data-onsuccess="onSignIn" >
+   <div style="width: 140px">
+   <div id="signinbut">
+   </div>
+   </div>
+   </a> 
   <!-- </div> -->
  </header> 
 <div class="bkg"></div>
@@ -506,7 +523,7 @@ function renderButton() {
 
 
 <script>
-    TweenMax.to('#plain6', 5, {bezier:{curviness:1.25, values:[{x:'48%', y:'-73%'}, {x:'93%', y:'-294%'}, {x:'78%', y:'-470%'},{x:'48%',y:'-583%'}], autoRotate:true}, backgroundColor:"#f00", ease:Power1.easeInOut});
+    // TweenMax.to('#plain6', 5, {bezier:{curviness:1.25, values:[{x:'48%', y:'-73%'}, {x:'93%', y:'-294%'}, {x:'78%', y:'-470%'},{x:'48%',y:'-583%'}], autoRotate:true}, backgroundColor:"#f00", ease:Power1.easeInOut});
 
 
 
